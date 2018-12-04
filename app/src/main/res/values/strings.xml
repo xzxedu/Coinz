@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Coinz</string>
+    <string name="action_settings">Settings</string>
+    <string name="access_token">pk.eyJ1IjoieHp4ZWR1IiwiYSI6ImNqcDhnMTRyeDFicXgzcW8zZXdpZDliY3oifQ.GuEtv7k1dtejwCWNjKOaEw</string>
+</resources>
