@@ -20,6 +20,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 
 import com.example.xzx.coinz.R.id.mapView
 import com.example.xzx.coinz.R.string.access_token
+import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.geometry.LatLng
 
 /**
  * Use the Location component to easily add a device location "puck" to a Mapbox map.
@@ -48,6 +50,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     override fun onMapReady(mapboxMap: MapboxMap) {
         this@MapActivity.mapboxMap = mapboxMap
         enableLocationComponent()
+
+        // Create an Icon object for the marker to use
+        //val icon = IconFactory.getInstance(this@MapActivity).fromResource(R.drawable.mapbox_user_icon)
+
+        mapboxMap.addMarker(MarkerOptions()
+                .position(LatLng(55.93863, -3.17603))
+                .title(getString(R.string.draw_marker_options_title))
+                .snippet(getString(R.string.draw_marker_options_snippet)))
     }
 
     @SuppressWarnings("MissingPermission")
@@ -95,22 +105,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
             finish()
         }
     }
-
-
-//    val locationComponent = mapboxMap?.locationComponent
-//
-//    locationComponent.addOnCameraTrackingChangedListener(object : OnCameraTrackingChangedListener {
-//        override fun onCameraTrackingDismissed() {
-//            // Tracking has been dismissed
-//
-//        }
-//
-//        override fun onCameraTrackingChanged(currentMode: Int) {
-//            // CameraMode has been updated
-//
-//        }
-//    })
-
 
     override fun onStart() {
         super.onStart()

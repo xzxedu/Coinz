@@ -4,5 +4,9 @@
     <string name="access_token">pk.eyJ1IjoieHp4ZWR1IiwiYSI6ImNqcDhnMTRyeDFicXgzcW8zZXdpZDliY3oifQ.GuEtv7k1dtejwCWNjKOaEw</string>
     <string name="user_location_permission_explanation">This app needs location permissions in order to show its functionality.</string>
     <string name="user_location_permission_not_granted">You didn\'t grant location permissions.</string>
+    <string name="press_to_start">press to start</string>
+
+    <string name="draw_marker_options_title">marker1</string>
+    <string name="draw_marker_options_snippet">marker2</string>
 
 </resources>
