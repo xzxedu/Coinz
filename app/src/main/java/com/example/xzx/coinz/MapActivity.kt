@@ -22,6 +22,12 @@ import com.example.xzx.coinz.R.id.mapView
 import com.example.xzx.coinz.R.string.access_token
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import com.mapbox.mapboxsdk.style.layers.LineLayer
+import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.Point
+import com.mapbox.mapboxsdk.style.light.Position
+
 
 /**
  * Use the Location component to easily add a device location "puck" to a Mapbox map.
@@ -31,6 +37,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     private var permissionsManager: PermissionsManager? = null
     private var mapboxMap: MapboxMap? = null
     private var mapView: MapView? = null
+    private var geoJsonString: String?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +65,23 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
                 .position(LatLng(55.93863, -3.17603))
                 .title(getString(R.string.draw_marker_options_title))
                 .snippet(getString(R.string.draw_marker_options_snippet)))
+
+        //where geoJsonString is the string with your GeoJson data. The method addLayer will generate and add a new LineLayer that
+        // will take all features from the GeoJson file (like lines and polygons) and render them as lines on the map.
+        val source = GeoJsonSource("geojson", geoJsonString)
+        mapboxMap.addSource(source)
+        mapboxMap.addLayer(LineLayer("geojson", "geojson"))
+        // render markers that are defined in GeoJson as Points
+        val featureCollection = geoJsonString?.let { FeatureCollection.fromJson(it) }
+        val features = featureCollection.getFeatures()
+        for (f in features) {
+            if (f.getGeometry() is Point) {
+                val coordinates = f.getGeometry().getCoordinates() as Position
+                mapboxMap.addMarker(MarkerOptions().position(LatLng(coordinates.getLatitude(),
+                                coordinates.getLongitude()))
+                )
+            }
+        }
     }
 
     @SuppressWarnings("MissingPermission")
