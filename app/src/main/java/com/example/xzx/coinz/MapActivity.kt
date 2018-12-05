@@ -44,7 +44,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync(this)
     }
-
+    // to show the user location, you need to update your Google Play to the latest version
     override fun onMapReady(mapboxMap: MapboxMap) {
         this@MapActivity.mapboxMap = mapboxMap
         enableLocationComponent()
@@ -71,7 +71,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
 
             // Set the component's camera mode
             locationComponent?.cameraMode = CameraMode.TRACKING
-            locationComponent?.renderMode = RenderMode.NORMAL
+            locationComponent?.renderMode = RenderMode.COMPASS
 
         } else {
             permissionsManager = PermissionsManager(this)
