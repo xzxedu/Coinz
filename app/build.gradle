@@ -8,7 +8,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.example.xzx.coinz"
-        minSdkVersion 25
+        minSdkVersion 27
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -40,5 +40,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     //mapbox dependencies
     implementation'com.mapbox.mapboxsdk:mapbox-android-sdk:6.7.1'
-    implementation'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.5.2'
+    implementation'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.11.0'
 }
