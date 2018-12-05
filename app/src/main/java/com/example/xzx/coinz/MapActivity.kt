@@ -96,6 +96,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
         }
     }
 
+
+//    val locationComponent = mapboxMap?.locationComponent
+//
+//    locationComponent.addOnCameraTrackingChangedListener(object : OnCameraTrackingChangedListener {
+//        override fun onCameraTrackingDismissed() {
+//            // Tracking has been dismissed
+//
+//        }
+//
+//        override fun onCameraTrackingChanged(currentMode: Int) {
+//            // CameraMode has been updated
+//
+//        }
+//    })
+
+
     override fun onStart() {
         super.onStart()
         mapView?.onStart()
