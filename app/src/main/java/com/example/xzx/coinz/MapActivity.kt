@@ -1,8 +1,10 @@
 package com.example.xzx.coinz
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.widget.Toast
 import com.example.xzx.coinz.R
 
@@ -20,6 +22,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 
 import com.example.xzx.coinz.R.id.mapView
 import com.example.xzx.coinz.R.string.access_token
+import com.google.gson.JsonArray
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
@@ -27,17 +30,30 @@ import com.mapbox.mapboxsdk.style.layers.LineLayer
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.style.light.Position
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import com.mapbox.geojson.Feature
+import com.mapbox.geojson.Geometry
+import com.google.gson.JsonObject
+import com.mapbox.mapboxsdk.annotations.Icon
+import com.mapbox.mapboxsdk.annotations.IconFactory
 
 
 /**
  * Use the Location component to easily add a device location "puck" to a Mapbox map.
  */
-class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener  {
 
     private var permissionsManager: PermissionsManager? = null
     private var mapboxMap: MapboxMap? = null
     private var mapView: MapView? = null
+    private var p : Point ?= null
     private var geoJsonString: String?= null
+
+    private val tag = "MapActivity"
+    private var downloadDate = "" // Format: YYYY/MM/DD
+    private val preferencesFile = "MyPrefsFile" // for storing preferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,29 +73,32 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     override fun onMapReady(mapboxMap: MapboxMap) {
         this@MapActivity.mapboxMap = mapboxMap
         enableLocationComponent()
-
         // Create an Icon object for the marker to use
-        //val icon = IconFactory.getInstance(this@MapActivity).fromResource(R.drawable.mapbox_user_icon)
+        val icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
 
-        mapboxMap.addMarker(MarkerOptions()
-                .position(LatLng(55.93863, -3.17603))
-                .title(getString(R.string.draw_marker_options_title))
-                .snippet(getString(R.string.draw_marker_options_snippet)))
-
-        //where geoJsonString is the string with your GeoJson data. The method addLayer will generate and add a new LineLayer that
-        // will take all features from the GeoJson file (like lines and polygons) and render them as lines on the map.
+        //where geoJsonString is the string with your GeoJson data.
+        // The method addLayer will generate and add a new LineLayer
         val source = GeoJsonSource("geojson", geoJsonString)
         mapboxMap.addSource(source)
         mapboxMap.addLayer(LineLayer("geojson", "geojson"))
-        // render markers that are defined in GeoJson as Points
-        val featureCollection = geoJsonString?.let { FeatureCollection.fromJson(it) }
-        val features = featureCollection.getFeatures()
-        for (f in features) {
-            if (f.getGeometry() is Point) {
-                val coordinates = f.getGeometry().getCoordinates() as Position
-                mapboxMap.addMarker(MarkerOptions().position(LatLng(coordinates.getLatitude(),
-                                coordinates.getLongitude()))
-                )
+        val fc = geoJsonString?.let { FeatureCollection.fromJson(it) }
+        val features = fc?.features()
+        var symbol: String
+        // f is a Feature. get f's coordinates :
+        features?.let{
+            for (f in it) {
+                val j = f.properties() as JsonObject
+                symbol =j.get("marker-symbol") as String
+                if (f.geometry() is Point) {
+                    p = f.geometry() as Point
+                    mapboxMap.addMarker(MarkerOptions()
+                            //.position(LatLng(55.93863, -3.17603))
+                            .title(getString(R.string.draw_marker_options_title))
+                            .snippet(symbol)
+                            .icon(icon)
+                            .position(LatLng(p!!.latitude(),
+                                    p!!.longitude())))
+                }
             }
         }
     }
@@ -133,6 +152,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     override fun onStart() {
         super.onStart()
         mapView?.onStart()
+
+        // Restore preferences
+        val settings = getSharedPreferences(preferencesFile, Context.MODE_PRIVATE)
+        // use ”” as the default value (this might be the first time the app is run)
+        // required to check if you have downloaded todays map before
+        downloadDate = settings.getString("lastDownloadDate", "")
+        // Write a message to ”logcat” (for debugging purposes)
+        Log.d(tag, "[onStart] Recalled lastDownloadDate is ’$downloadDate’")
+
     }
 
     override fun onResume() {
@@ -148,6 +176,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     override fun onStop() {
         super.onStop()
         mapView?.onStop()
+
+        Log.d(tag, "[onStop] Storing lastDownloadDate of $downloadDate")
+        // All objects are from android.context.Context
+        val settings = getSharedPreferences(preferencesFile, Context.MODE_PRIVATE)
+        // We need an Editor object to make preference changes.
+        val editor = settings.edit()
+        editor.putString("lastDownloadDate", downloadDate)
+        // Apply the edits!
+        editor.apply()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -165,3 +202,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
         mapView?.onLowMemory()
     }
 }
+//   //  a String with geojson data in it.
+//   // Use those two methods to convert the content of a .geojson file at a specific URI to a String.
+//    @Throws(Exception::class)
+//    private fun convertStreamToString(`is`: InputStream):String {
+//        val reader = BufferedReader(InputStreamReader(`is`))
+//        val sb = StringBuilder()
+//        val line:String ?= null
+//        while ((line = reader.readLine()) != null)
+//        {
+//            sb.append(line).append("\n")
+//        }
+//        reader.close()
+//        return sb.toString()
+//    }
+//    @Throws(Exception::class)
+//    fun getStringFromFile(fileUri:Uri, context:Context):String {
+//        val fin = context.getContentResolver().openInputStream(fileUri)
+//        val ret = convertStreamToString(fin)
+//        fin.close()
+//        return ret
+//    }
+    // ******************************** download today's map *************************************//
