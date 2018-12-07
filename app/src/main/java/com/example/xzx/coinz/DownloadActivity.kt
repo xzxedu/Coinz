@@ -23,12 +23,11 @@ import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-var geoJsonString:String ?= null
+var downloadDate = LocalDateTime.now().format(
+        DateTimeFormatter.ofPattern("yyyy/MM/dd")) // Format: YYYY/MM/DD
 
 class DownloadActivity : AppCompatActivity() {
     private val tag = "DownloadActivity"
-    private var downloadDate = LocalDateTime.now().format(
-            DateTimeFormatter.ofPattern("yyyy/MM/dd")) // Format: YYYY/MM/DD
     private val preferencesFile = "MyPrefsFile" // for storing preferences
 
     private var networkChangeReceiver:NetworkChangeReceiver?=null
@@ -69,12 +68,8 @@ class DownloadActivity : AppCompatActivity() {
                 // Start downloading
                 progressbar!!.max = 100
                 var DateUrl = "http://homepages.inf.ed.ac.uk/stg/coinz/2018/01/01/coinzmap.geojson"
-                geoJsonString = DownloadTask(this,progressbar!!, textview!!,
-                                                  DownloadCompleteRunner).execute(DateUrl) as String
-//                val pref = getSharedPreferences("user", Context.MODE_PRIVATE)
-//                val editor = pref.edit()
-//                editor.putInt("songNum", newest)
-//                editor.apply()
+                DownloadTask(this,progressbar!!, textview!!,
+                              DownloadCompleteRunner).execute(DateUrl)
             } catch (e: IOException) {
                 snackbar(find(R.id.progressBar1), "download failed")
             }

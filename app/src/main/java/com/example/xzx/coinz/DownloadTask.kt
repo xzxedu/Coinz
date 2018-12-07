@@ -20,21 +20,13 @@ import java.net.HttpURLConnection
  * @param activity the activity calling this class
  * @param progressbar shows the progress of downloading
  * @param textview shows the progress of downloading
+ * @param caller the object of DownloadCompleteListener
  *
  */
 class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val textview: TextView,
                    private val caller : DownloadCompleteListener): AsyncTask<String,Double,String>() {
 
-    /**
-     * Format all Int numbers under 10 to the String with "0i" type
-     *
-     * @param i Int number
-     */
-    private fun formatNum(i : Int): String =
-            if(i<10)
-                "0"+i.toString()
-            else
-                i.toString()
+    private val root = Environment.getExternalStorageDirectory()
 
     override fun doInBackground(vararg urls: String): String = try {
         loadFileFromNetwork(urls[0])
@@ -49,13 +41,20 @@ class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val text
         var line: String?
         val br = BufferedReader(InputStreamReader(stream))
         line = br.readLine()
-
+        var i = 0
         while (line != null) {
             sb.append(line)
             line = br.readLine()
+            i += 1
+            publishProgress(i.toDouble())
         }
         br.close()
-        DownloadCompleteRunner.result = sb.toString()
+
+        // The directory for files to be downloaded
+        val mapdir = File(root.absolutePath,  "maplist")
+
+        FileUtils.copyURLToFile(URL(sb.toString()), File(mapdir.absolutePath))
+
         return DownloadCompleteRunner.result!!
     }
 
@@ -80,24 +79,6 @@ class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val text
         progressbar.progress = 0
         textview.text = "downloading "
     }
-
-//    override fun doInBackground(vararg params: Int?): Int {
-//            try {
-//                // The directory for files to be downloaded
-//                val songdir = File(root.absolutePath,  "songlist")
-//
-//                // Download the fourth and fifth version of maps not in local storage
-//                for (i in current+1..newest) {
-//                    val mapurl = url
-//                    FileUtils.copyURLToFile(URL(mapurl), File(songdir.absolutePath, formatNum(i) + "/" + "map5.kml"))
-//                    publishProgress(i.toDouble(), i.toDouble())
-//                }
-//            }catch (exception: IOException){
-//                exception.printStackTrace()
-//            }
-//        return 1
-//    }
-
 
     override fun onProgressUpdate(vararg values: Double?) {
         val progress = (values[0]!!*100).toInt()

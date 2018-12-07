@@ -3,6 +3,7 @@ package com.example.xzx.coinz
 import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Environment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -31,18 +32,16 @@ import com.mapbox.mapboxsdk.style.layers.LineLayer
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.style.light.Position
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.Geometry
 import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import org.jetbrains.anko.startActivity
-import java.io.IOException
+import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.charset.Charset
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -57,6 +56,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     private var mapboxMap: MapboxMap? = null
     private var mapView: MapView? = null
     private var p: Point? = null
+    private var geoJsonString:String ?= null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +84,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
         val icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
         //where geoJsonString is the string with your GeoJson data.
         // The method addLayer will generate and add a new LineLayer
+        val root = Environment.getExternalStorageDirectory()
+        val mapdir = File(root.absolutePath,  "maplist")
+        val myFile = File(mapdir.absolutePath)
+        var ins: InputStream = myFile.inputStream()
+        var geoJsonString = ins.readBytes().toString(Charset.defaultCharset())
         val source = GeoJsonSource("geojson", geoJsonString)
         mapboxMap.addSource(source)
         mapboxMap.addLayer(LineLayer("geojson", "geojson"))
