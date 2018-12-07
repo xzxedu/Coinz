@@ -23,7 +23,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 
 import com.example.xzx.coinz.R.id.mapView
-import com.example.xzx.coinz.R.string.access_token
 import com.google.gson.JsonArray
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.geometry.LatLng

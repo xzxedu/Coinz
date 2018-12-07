@@ -18,7 +18,7 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.support.v4.alert
-import org.w3c.dom.Text
+//import org.w3c.dom.Text
 import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

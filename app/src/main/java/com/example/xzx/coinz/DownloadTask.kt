@@ -16,7 +16,6 @@ import java.net.HttpURLConnection
 
 /**
  * This class extends from AsyncTask and downloads new songs and lyrics on the server asynchronously
- *
  * @param activity the activity calling this class
  * @param progressbar shows the progress of downloading
  * @param textview shows the progress of downloading
