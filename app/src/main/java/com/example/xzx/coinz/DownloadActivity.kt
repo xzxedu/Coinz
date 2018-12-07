@@ -70,7 +70,7 @@ class DownloadActivity : AppCompatActivity() {
                 progressbar!!.max = 100
                 var DateUrl = "http://homepages.inf.ed.ac.uk/stg/coinz/2018/01/01/coinzmap.geojson"
                 geoJsonString = DownloadTask(this,progressbar!!, textview!!,
-                                                     DownloadCompleteRunner).execute(DateUrl).get()
+                                                  DownloadCompleteRunner).execute(DateUrl) as String
 //                val pref = getSharedPreferences("user", Context.MODE_PRIVATE)
 //                val editor = pref.edit()
 //                editor.putInt("songNum", newest)

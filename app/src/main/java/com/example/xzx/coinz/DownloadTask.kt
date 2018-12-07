@@ -9,23 +9,17 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import org.apache.commons.io.FileUtils
 import org.jsoup.Jsoup
-import java.io.File
-import java.io.IOException
 import java.net.URL
 import org.jetbrains.anko.*
-import java.io.InputStream
+import java.io.*
 import java.net.HttpURLConnection
 
 /**
  * This class extends from AsyncTask and downloads new songs and lyrics on the server asynchronously
  *
- *
  * @param activity the activity calling this class
  * @param progressbar shows the progress of downloading
  * @param textview shows the progress of downloading
- * @param current the number of songs in local storage
- * @param newest the number of songs on the server
- *
  *
  */
 class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val textview: TextView,
@@ -51,6 +45,17 @@ class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val text
     private fun loadFileFromNetwork(urlString: String): String {
         val stream: InputStream = downloadUrl(urlString)
         // Read input from stream, build result as a string
+        val sb = StringBuilder()
+        var line: String?
+        val br = BufferedReader(InputStreamReader(stream))
+        line = br.readLine()
+
+        while (line != null) {
+            sb.append(line)
+            line = br.readLine()
+        }
+        br.close()
+        DownloadCompleteRunner.result = sb.toString()
         return DownloadCompleteRunner.result!!
     }
 
