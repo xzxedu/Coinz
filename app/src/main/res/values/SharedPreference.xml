@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <!--if downloaded map, make sure you have saved lastDownladDate in shared preferences-->
-<map>
+<resources>
     <string name="lastDownloadDate">2018/10/03</string>
-    </map>
+</resources>

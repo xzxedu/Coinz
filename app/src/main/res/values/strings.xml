@@ -8,5 +8,7 @@
 
     <string name="draw_marker_options_title">marker1</string>
     <string name="draw_marker_options_snippet">marker2</string>
+    <string name="title_activity_download">DownloadActivity</string>
+    <string name="title_activity_rank">RankActivity</string>
 
 </resources>
