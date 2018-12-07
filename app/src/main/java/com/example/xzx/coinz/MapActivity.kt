@@ -91,14 +91,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
         val source = GeoJsonSource("geojson", geoJsonString)
         mapboxMap.addSource(source)
         mapboxMap.addLayer(LineLayer("geojson", "geojson"))
-        val fc = geoJsonString?.let { FeatureCollection.fromJson(it) }
+        val fc = geoJsonString.let { FeatureCollection.fromJson(it) }
         val features = fc?.features()
         var symbol: String
         // f is a Feature. get f's coordinates :
         features?.let {
             for (f in it) {
                 val j = f.properties() as JsonObject
-                symbol = j.get("marker-symbol") as String
+                symbol = j.get("marker-symbol").toString()
                 if (f.geometry() is Point) {
                     p = f.geometry() as Point
                     mapboxMap.addMarker(MarkerOptions()
