@@ -79,7 +79,6 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
         myToolBar.setOnClickListener{
             finish()
         }
-
     }
 
     override fun onStart() {
@@ -89,8 +88,9 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
             try {
                 // Start downloading
                 progressbar!!.max = 100
-                var DateUrl = "http://homepages.inf.ed.ac.uk/stg/coinz/2018/01/01/coinzmap.geojson"
-                Log.i(tag,"startdownloadmap")
+                val currentDate= LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                var DateUrl= "http://homepages.inf.ed.ac.uk/stg/coinz/"+currentDate +"/coinzmap.geojson"
+                Log.i(tag,DateUrl)
                 DownloadTask(this,progressbar!!, textview!!,
                               this).execute(DateUrl)
 
@@ -108,11 +108,6 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
 //        // Write a message to ”logcat” (for debugging purposes)
 //        Log.d(tag, "[onStart] Recalled lastDownloadDate is ’$downloadDate’")
     }
-
-//    override fun onDestroy() {
-//        super.onDestroy()
-////        unregisterReceiver(networkChangeReceiver)
-//    }
 
     override fun onStop() {
         super.onStop()

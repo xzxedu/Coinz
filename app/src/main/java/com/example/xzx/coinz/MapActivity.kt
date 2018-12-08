@@ -2,6 +2,7 @@ package com.example.xzx.coinz
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
@@ -62,20 +63,61 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        this@MapActivity.mapboxMap = mapboxMap
         this@MapActivity.geoJsonString = data!!.getStringExtra("geostring")
-        Log.d(tag,"onActivity"+geoJsonString)
+        //Log.d(tag,"onActivity"+geoJsonString)
+        // Create an Icon object for the marker to use
+//        val icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
+        val source = GeoJsonSource("geojson", geoJsonString!!)
+        mapboxMap!!.addSource(source)
+        mapboxMap!!.addLayer(LineLayer("geojson", "geojson"))
+        val fc = geoJsonString!!.let { FeatureCollection.fromJson(it) }
+        val features = fc?.features()
+        var icon:Icon?= null
+        var color :String
+        // f is a Feature. get f's coordinates :
+        features?.let {
+            for (f in it) {
+                val j = f.properties() as JsonObject
+                if (f.geometry() is Point) {
+                    p = f.geometry() as Point
+                     // Create an Icon object for the marker to use
+                    color = j.get("currency").toString()
+                    Log.d(tag,"original"+color)
+                    if (color.equals("DOLR",true)){
+                        Log.d(tag,"DOLR"+color)}
+                    else Log.d(tag,"else"+color)
+//                       icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)}
+//                    else if (j.get("green").toString() == "008000"){
+//                        Log.d(tag,"green"+j.get("marker-color").toString())
+//                        icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_green)}
+//                    else if (j.get("marker-color").toString() == "0000ff"){
+//                        Log.d(tag,"blue"+j.get("marker-color").toString())
+//                        icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)}
+//                    else   icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_red)
+//                    when (j.get("marker-color").toString()){
+//                        "#ff0000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_red)
+//                        "#008000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_green)
+//                        "#0000ff" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
+//                        "#ffdf00" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)
+//                    }
+                    mapboxMap!!.addMarker(MarkerOptions()
+                            .title(j.get("currency").toString())
+                            .snippet(j.get("marker-symbol").toString())
+//                            .icon(icon)
+                            .position(LatLng(p!!.latitude(), p!!.longitude())))
+                }
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
         Mapbox.getInstance(this, getString(R.string.access_token))
-
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_map)
-
         mapView = findViewById(R.id.mapView)
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync(this)
@@ -85,35 +127,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     override fun onMapReady(mapboxMap: MapboxMap) {
         this@MapActivity.mapboxMap = mapboxMap
         enableLocationComponent()
-        Log.d(tag,"beforestart"+ geoJsonString)
         startActivityForResult<DownloadActivity>(1)
-        Log.d(tag,"afterstart"+geoJsonString)
-        // Create an Icon object for the marker to use
-        val icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
-
-
-        val source = GeoJsonSource("geojson", geoJsonString!!)
-        mapboxMap.addSource(source)
-        mapboxMap.addLayer(LineLayer("geojson", "geojson"))
-        val fc = geoJsonString!!.let { FeatureCollection.fromJson(it) }
-        val features = fc?.features()
-        var symbol: String
-        // f is a Feature. get f's coordinates :
-        features?.let {
-            for (f in it) {
-                val j = f.properties() as JsonObject
-                symbol = j.get("marker-symbol").toString()
-                if (f.geometry() is Point) {
-                    p = f.geometry() as Point
-                    mapboxMap.addMarker(MarkerOptions()
-                            //.position(LatLng(55.93863, -3.17603))
-                            .title(getString(R.string.draw_marker_options_title))
-                            .snippet(symbol)
-                            .icon(icon)
-                            .position(LatLng(p!!.latitude(), p!!.longitude())))
-                }
-            }
-        }
     }
 
     @SuppressWarnings("MissingPermission")
