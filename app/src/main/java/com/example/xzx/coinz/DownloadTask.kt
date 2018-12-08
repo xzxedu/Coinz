@@ -14,18 +14,9 @@ import org.jetbrains.anko.*
 import java.io.*
 import java.net.HttpURLConnection
 
-/**
- * This class extends from AsyncTask and downloads new songs and lyrics on the server asynchronously
- * @param activity the activity calling this class
- * @param progressbar shows the progress of downloading
- * @param textview shows the progress of downloading
- * @param caller the object of DownloadCompleteListener
- *
- */
-class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val textview: TextView,
-                   private val caller : DownloadCompleteListener): AsyncTask<String,Double,String>() {
-
-    private val root = Environment.getExternalStorageDirectory()
+public class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val textview: TextView,
+                                 private val caller : DownloadCompleteListener): AsyncTask<String, Double, String>()
+{ //    private val root = Environment.getExternalStorageDirectory()
 
     override fun doInBackground(vararg urls: String): String = try {
         loadFileFromNetwork(urls[0])
@@ -49,12 +40,11 @@ class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val text
         }
         br.close()
 
+        return sb.toString()
         // The directory for files to be downloaded
-        val mapdir = File(root.absolutePath,  "maplist")
-
-        FileUtils.copyURLToFile(URL(sb.toString()), File(mapdir.absolutePath))
-
-        return DownloadCompleteRunner.result!!
+//        val mapdir = File(root.absolutePath,  "maplist")
+//
+//        FileUtils.copyURLToFile(URL(sb.toString()), File(mapdir.absolutePath))
     }
 
     // Given a string representation of a URL, sets up a connection and gets an input stream.
@@ -71,8 +61,6 @@ class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val text
         return conn.inputStream
     }
 
-
-
     override fun onPreExecute() {
         progressbar.visibility = View.VISIBLE
         progressbar.progress = 0
@@ -80,30 +68,18 @@ class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val text
     }
 
     override fun onProgressUpdate(vararg values: Double?) {
-        val progress = (values[0]!!*100).toInt()
+        val progress = (values[0]!! * 100).toInt()
         progressbar.progress = progress
-        textview.text="downloading: ${values[1]!!.toInt()} "
+        textview.text = "downloading: ${progress} "
     }
 
     override fun onPostExecute(result: String) {
+        super.onPostExecute(result)
         progressbar.progress = 100
-        textview.text="complete!"
+        textview.text = "complete!"
+        caller.downloadComplete(result)
         // Finish UpdateSongActivity and go back to MapActivity
         activity.finish()
     }
 }
-//    override fun onPostExecute(result: String) {
-//        super.onPostExecute(result)
-//        caller.downloadComplete(result)
-//    }
 
-interface DownloadCompleteListener {
-    fun downloadComplete(result: String)
-}
-object DownloadCompleteRunner : DownloadCompleteListener {
-    var result: String? = null
-    override fun downloadComplete(result: String) {
-        // TODO: do whatever you want
-        this.result = result
-    }
-}

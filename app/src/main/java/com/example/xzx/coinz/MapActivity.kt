@@ -1,6 +1,7 @@
 package com.example.xzx.coinz
 
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
@@ -37,6 +38,7 @@ import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.startActivityForResult
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -50,13 +52,16 @@ import java.util.*
  * Use the Location component to easily add a device location "puck" to a Mapbox map.
  */
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
-
+    private val tag ="MapActivity"
     private var permissionsManager: PermissionsManager? = null
     private var mapboxMap: MapboxMap? = null
     private var mapView: MapView? = null
     private var p: Point? = null
-    private var geoJsonString:String ?= null
-
+    private var geoJsonString:String?=null
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        geoJsonString = data!!.getStringExtra("geostring")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,21 +82,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     override fun onMapReady(mapboxMap: MapboxMap) {
         this@MapActivity.mapboxMap = mapboxMap
         enableLocationComponent()
-        startActivity<DownloadActivity>()
+        startActivityForResult<DownloadActivity>(1)
 
         // Create an Icon object for the marker to use
         val icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
         //where geoJsonString is the string with your GeoJson data.
         // The method addLayer will generate and add a new LineLayer
-        val root = Environment.getExternalStorageDirectory()
-        val mapdir = File(root.absolutePath,  "maplist")
-        val myFile = File(mapdir.absolutePath)
-        var ins: InputStream = myFile.inputStream()
-        var geoJsonString = ins.readBytes().toString(Charset.defaultCharset())
+        //val root = Environment.getExternalStorageDirectory()
+        //val mapdir = File(root.absolutePath,  "maplist")
+        //val myFile = File(mapdir.absolutePath)
+        //var ins: InputStream = myFile.inputStream()
+        //var geoJsonString = ins.readBytes().toString(Charset.defaultCharset())
+        //Log.i(tag,geoJsonString)
         val source = GeoJsonSource("geojson", geoJsonString)
         mapboxMap.addSource(source)
         mapboxMap.addLayer(LineLayer("geojson", "geojson"))
-        val fc = geoJsonString.let { FeatureCollection.fromJson(it) }
+        val fc = geoJsonString!!.let { FeatureCollection.fromJson(it) }
         val features = fc?.features()
         var symbol: String
         // f is a Feature. get f's coordinates :
