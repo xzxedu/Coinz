@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
 
-
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 //import com.mapbox.mapboxandroiddemo.R
@@ -40,14 +39,6 @@ import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.startActivityForResult
-import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
-import java.nio.charset.Charset
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
-
 
 /**
  * Use the Location component to easily add a device location "puck" to a Mapbox map.
@@ -65,9 +56,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
         super.onActivityResult(requestCode, resultCode, data)
         this@MapActivity.mapboxMap = mapboxMap
         this@MapActivity.geoJsonString = data!!.getStringExtra("geostring")
-        //Log.d(tag,"onActivity"+geoJsonString)
         // Create an Icon object for the marker to use
-//        val icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
         val source = GeoJsonSource("geojson", geoJsonString!!)
         mapboxMap!!.addSource(source)
         mapboxMap!!.addLayer(LineLayer("geojson", "geojson"))
@@ -82,30 +71,18 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
                 if (f.geometry() is Point) {
                     p = f.geometry() as Point
                      // Create an Icon object for the marker to use
-                    color = j.get("currency").toString()
+                    color = j.get("marker-color").toString()
                     color = color.replace('\"',' ').trim()
-                    Log.d(tag,"original"+color)
-                    if (color.equals("DOLR")){
-                        Log.d(tag,"DOLR"+color)}
-                    else Log.d(tag,"else"+color)
-//                       icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)}
-//                    else if (j.get("green").toString() == "008000"){
-//                        Log.d(tag,"green"+j.get("marker-color").toString())
-//                        icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_green)}
-//                    else if (j.get("marker-color").toString() == "0000ff"){
-//                        Log.d(tag,"blue"+j.get("marker-color").toString())
-//                        icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)}
-//                    else   icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_red)
-//                    when (j.get("marker-color").toString()){
-//                        "#ff0000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_red)
-//                        "#008000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_green)
-//                        "#0000ff" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
-//                        "#ffdf00" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)
-//                    }
+                    when (color){
+                        "#ff0000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.drawable.mapbox_marker_icon_default)
+                        "#008000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_green)
+                        "#0000ff" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
+                        "#ffdf00" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)
+                    }
                     mapboxMap!!.addMarker(MarkerOptions()
                             .title(j.get("currency").toString())
                             .snippet(j.get("marker-symbol").toString())
-//                            .icon(icon)
+                            .icon(icon)
                             .position(LatLng(p!!.latitude(), p!!.longitude())))
                 }
             }
