@@ -13,11 +13,23 @@ import java.net.URL
 import org.jetbrains.anko.*
 import java.io.*
 import java.net.HttpURLConnection
+import android.content.Intent
 
-public class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val textview: TextView,
+
+
+/**
+ * This class extends from AsyncTask and downloads new songs and lyrics on the server asynchronously
+ * @param activity the activity calling this class
+ * @param progressbar shows the progress of downloading
+ * @param textview shows the progress of downloading
+ * @param caller the object of DownloadCompleteListener
+ *
+ */
+
+class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val textview: TextView,
                                  private val caller : DownloadCompleteListener): AsyncTask<String, Double, String>()
 { //    private val root = Environment.getExternalStorageDirectory()
-
+    private val tag = "DownloadTask"
     override fun doInBackground(vararg urls: String): String = try {
         loadFileFromNetwork(urls[0])
     } catch (e: IOException) {
@@ -39,10 +51,7 @@ public class DownloadTask(val activity : Activity,val progressbar: ProgressBar,v
             publishProgress(i.toDouble())
         }
         br.close()
-
         return sb.toString()
-        // The directory for files to be downloaded
-//        val mapdir = File(root.absolutePath,  "maplist")
 //
 //        FileUtils.copyURLToFile(URL(sb.toString()), File(mapdir.absolutePath))
     }

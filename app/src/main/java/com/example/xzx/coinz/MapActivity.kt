@@ -57,10 +57,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     private var mapboxMap: MapboxMap? = null
     private var mapView: MapView? = null
     private var p: Point? = null
-    private var geoJsonString:String?=null
+
+    private lateinit var geoJsonString:String
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        geoJsonString = data!!.getStringExtra("geostring")
+        this@MapActivity.geoJsonString = data!!.getStringExtra("geostring")
+        Log.d(tag,"onActivity"+geoJsonString)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,19 +85,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     override fun onMapReady(mapboxMap: MapboxMap) {
         this@MapActivity.mapboxMap = mapboxMap
         enableLocationComponent()
+        Log.d(tag,"beforestart"+ geoJsonString)
         startActivityForResult<DownloadActivity>(1)
-
+        Log.d(tag,"afterstart"+geoJsonString)
         // Create an Icon object for the marker to use
         val icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
-        //where geoJsonString is the string with your GeoJson data.
-        // The method addLayer will generate and add a new LineLayer
-        //val root = Environment.getExternalStorageDirectory()
-        //val mapdir = File(root.absolutePath,  "maplist")
-        //val myFile = File(mapdir.absolutePath)
-        //var ins: InputStream = myFile.inputStream()
-        //var geoJsonString = ins.readBytes().toString(Charset.defaultCharset())
-        //Log.i(tag,geoJsonString)
-        val source = GeoJsonSource("geojson", geoJsonString)
+
+
+        val source = GeoJsonSource("geojson", geoJsonString!!)
         mapboxMap.addSource(source)
         mapboxMap.addLayer(LineLayer("geojson", "geojson"))
         val fc = geoJsonString!!.let { FeatureCollection.fromJson(it) }

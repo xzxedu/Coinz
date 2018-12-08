@@ -49,10 +49,13 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
 //    private var networkChangeReceiver:NetworkChangeReceiver?=null
     private var progressbar: ProgressBar?=null
     private var textview: TextView?=null
+    private var networkChangeReceiver:NetworkChangeReceiver?=null
+
 
     override fun downloadComplete(result: String) {
         geoJsonString = result
-        var intent = Intent()
+        //Log.i(tag,geoJsonString)
+        var intent = Intent() // Obtain values from previous activity
         intent.putExtra("geostring", geoJsonString)
         setResult(Activity.RESULT_OK, intent)
         finish()
@@ -62,14 +65,11 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_download)
 
-        // Obtain values from previous activity
-        val intent = intent
-
         // Network monitoring
         val intentFilter = IntentFilter()
         intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
-//        networkChangeReceiver =NetworkChangeReceiver()
-//        registerReceiver(networkChangeReceiver, intentFilter)
+        networkChangeReceiver =NetworkChangeReceiver()
+        registerReceiver(networkChangeReceiver, intentFilter)
 
         // Initialize widgets
         progressbar = find(R.id.progressBar1)
@@ -82,7 +82,6 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
 
     }
 
-
     override fun onStart() {
         super.onStart()
 
@@ -91,6 +90,7 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
                 // Start downloading
                 progressbar!!.max = 100
                 var DateUrl = "http://homepages.inf.ed.ac.uk/stg/coinz/2018/01/01/coinzmap.geojson"
+                Log.i(tag,"startdownloadmap")
                 DownloadTask(this,progressbar!!, textview!!,
                               this).execute(DateUrl)
 
@@ -126,18 +126,23 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
         editor.apply()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(networkChangeReceiver)
+    }
+
     private fun isExternalStorageWritable():Boolean=
             Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
 
-    /**
-     * This class extends from AsyncTask and downloads new songs and lyrics on the server asynchronously
-     * @param activity the activity calling this class
-     * @param progressbar shows the progress of downloading
-     * @param textview shows the progress of downloading
-     * @param caller the object of DownloadCompleteListener
-     *
-     */
-
+    private inner class NetworkChangeReceiver: BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val connectivityManager = context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = connectivityManager.activeNetworkInfo
+            if (networkInfo == null || !networkInfo.isAvailable) {
+                longSnackbar(find<RecyclerView>(R.id.recycler_view_timeline), "network unavailable, please check your network")
+            }
+        }
+    }
 }
 
 
