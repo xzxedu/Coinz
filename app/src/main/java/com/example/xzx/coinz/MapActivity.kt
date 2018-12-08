@@ -83,8 +83,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
                     p = f.geometry() as Point
                      // Create an Icon object for the marker to use
                     color = j.get("currency").toString()
+                    color = color.replace('\"',' ').trim()
                     Log.d(tag,"original"+color)
-                    if (color.equals("DOLR",true)){
+                    if (color.equals("DOLR")){
                         Log.d(tag,"DOLR"+color)}
                     else Log.d(tag,"else"+color)
 //                       icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)}

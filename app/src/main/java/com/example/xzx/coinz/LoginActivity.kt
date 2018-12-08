@@ -23,6 +23,7 @@ import android.widget.TextView
 
 import java.util.ArrayList
 import android.Manifest.permission.READ_CONTACTS
+import com.google.firebase.auth.FirebaseAuth
 
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -34,6 +35,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private var mAuthTask: UserLoginTask? = null
+    private var mAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +48,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                 return@OnEditorActionListener true
             }
             false
+            mAuth = FirebaseAuth.getInstance()
         })
 
         email_sign_in_button.setOnClickListener { attemptLogin() }
