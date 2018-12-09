@@ -29,8 +29,9 @@ android {
 ext {
     anko_version = '0.10.8'
 }
+
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
@@ -43,29 +44,32 @@ dependencies {
     // login
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.support:customtabs:27.1.1'
-
-    //implementation 'com.google.android.gms:play-services-location:15.0.1'
-    //fire base
-    implementation 'com.google.firebase:firebase-auth:16.0.4'
-    implementation 'com.google.firebase:firebase-core:16.0.4'
-    implementation 'com.google.firebase:firebase-firestore:17.1.1'
-    implementation 'com.firebaseui:firebase-ui-auth:4.2.1'
     // Android architecture
     implementation 'android.arch.core:runtime:1.1.1'
     implementation 'android.arch.core:common:1.1.1'
     //mapbox dependencies
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.7.1'
     //implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.11.0'
+    //implementation 'com.google.android.gms:play-services-location:15.0.1'
     //anko
     implementation "org.jetbrains.anko:anko:$anko_version"
     implementation "org.jetbrains.anko:anko-design:$anko_version"
     implementation "org.jetbrains.anko:anko-coroutines:$anko_version"
-
     implementation 'org.jsoup:jsoup:1.10.3'
     implementation 'commons-io:commons-io:2.6'
-
-    apply plugin:'com.google.gms.google-services'
-
+    //fire base
+    implementation 'com.google.firebase:firebase-auth:16.0.5'
+    implementation 'com.google.firebase:firebase-core:16.0.5'
+    implementation 'com.google.firebase:firebase-firestore:17.1.4'
+    implementation 'com.firebaseui:firebase-ui-auth:4.2.1'
+    implementation 'com.google.firebase:firebase-storage:16.0.5'
+    implementation 'com.firebaseui:firebase-ui-storage:4.2.1'
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    kapt 'com.github.bumptech.glide:compiler:4.6.1'
+    //kotlin annotation processor
+    apply plugin: 'kotlin-kapt'
+    apply plugin: 'com.google.gms.google-services'
     kotlin {
         experimental {
             coroutines "enable"
@@ -73,4 +77,6 @@ dependencies {
     }
 }
 
-apply plugin: 'com.google.gms.google-services'
+kapt {
+    generateStubs = true
+}

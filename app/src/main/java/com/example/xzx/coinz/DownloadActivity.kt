@@ -16,27 +16,10 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
-import com.google.gson.JsonObject
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.annotations.IconFactory
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.style.layers.LineLayer
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.support.v4.alert
-import java.io.BufferedReader
-//import org.w3c.dom.Text
 import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -95,10 +78,10 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
                               this).execute(DateUrl)
 
             } catch (e: IOException) {
-                snackbar(find(R.id.progressBar1), "download failed")
+                progressbar?.snackbar("download failed")
             }
         }else
-            snackbar(find(R.id.progressBar1), "try again.")
+            progressbar?.snackbar("try again.")
 
         // Restore preferences
         val settings = getSharedPreferences(preferencesFile, Context.MODE_PRIVATE)
@@ -133,8 +116,9 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
         override fun onReceive(context: Context?, intent: Intent?) {
             val connectivityManager = context!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val networkInfo = connectivityManager.activeNetworkInfo
+            var recycler_view_time = find<RecyclerView>(R.id.recycler_view_timeline)
             if (networkInfo == null || !networkInfo.isAvailable) {
-                longSnackbar(find<RecyclerView>(R.id.recycler_view_timeline), "network unavailable, please check your network")
+                recycler_view_time.longSnackbar("network unavailable, please check your network")
             }
         }
     }

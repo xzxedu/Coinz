@@ -11,6 +11,11 @@
         android:icon="@drawable/ic_account_circle_black_24dp"
         android:title="MyAccount" />
 
+    <item
+        android:id="@+id/start_button"
+        android:icon="@drawable/ic_fire_emoji"
+        android:title="Start Game" />
+
     <!--<item-->
         <!--android:id="@+id/navigation_notifications"-->
         <!--android:icon="@drawable/ic_notifications_black_24dp"-->
