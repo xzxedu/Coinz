@@ -20,15 +20,26 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MapActivity"
+            android:name=".SplashActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!--<activity-->
+            <!--android:name=".MapActivity"-->
+            <!--android:theme="@style/AppTheme.NoActionBar">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+        <activity
+            android:name=".MapActivity"
+            android:label="MapActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".DownloadActivity"
             android:label="@string/title_activity_download"
@@ -37,9 +48,19 @@
             android:name=".RankActivity"
             android:label="@string/title_activity_rank"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <!--<uses-library android:name="com.google.android.things" />-->
         <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"/>
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.IOT_LAUNCHER" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            <!--</intent-filter>-->
+        <activity
+            android:name=".SignInActivity"
+            android:label="start coinz"/>
     </application>
 
 </manifest>
