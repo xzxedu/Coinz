@@ -4,11 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.example.xzx.coinz.R.id.constraint_layout
 import com.example.xzx.coinz.R.id.account_sign_in
+import com.example.xzx.coinz.R
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
-import com.example.xzx.coinz.R.id.constraint_layout
 import com.example.xzx.coinz.util.FirestoreUtil
 import kotlinx.android.synthetic.main.activity_sign_in.*
 import org.jetbrains.anko.clearTask

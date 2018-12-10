@@ -21,8 +21,9 @@
             android:id="@+id/toolbar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
+            android:background="?android:attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
+
     </android.support.design.widget.AppBarLayout>
 
     <com.mapbox.mapboxsdk.maps.MapView
@@ -31,8 +32,18 @@
         android:layout_height="match_parent"
         mapbox:mapbox_cameraTargetLat="55.944"
         mapbox:mapbox_cameraTargetLng="-3.188396"
+        mapbox:mapbox_cameraZoom="15"
         mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"
-        mapbox:mapbox_cameraZoom="15" />
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <ImageButton
+            android:id="@+id/CollectButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="Collect coins"
+            app:srcCompat="@drawable/ic_fire_emoji" />
+    </com.mapbox.mapboxsdk.maps.MapView>
 
     <Button
         android:id="@+id/startButton"

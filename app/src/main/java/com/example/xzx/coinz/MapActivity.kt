@@ -3,6 +3,9 @@ package com.example.xzx.coinz
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
@@ -24,6 +27,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 
 import com.example.xzx.coinz.R.id.mapView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.gson.JsonArray
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -37,13 +42,14 @@ import com.mapbox.geojson.Geometry
 import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
+import kotlinx.android.synthetic.main.activity_map.*
 import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.startActivityForResult
 
 /**
  * Use the Location component to easily add a device location "puck" to a Mapbox map.
  */
-class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener{
     private val tag ="MapActivity"
     private var permissionsManager: PermissionsManager? = null
     private var mapboxMap: MapboxMap? = null
@@ -51,13 +57,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     private var p: Point? = null
 
     private lateinit var geoJsonString:String
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         this@MapActivity.mapboxMap = mapboxMap
         this@MapActivity.geoJsonString = data!!.getStringExtra("geostring")
         // Create an Icon object for the marker to use
-        val source = GeoJsonSource("geojson", geoJsonString!!)
+        val source = GeoJsonSource("geojson", geoJsonString)
         mapboxMap!!.addSource(source)
         mapboxMap!!.addLayer(LineLayer("geojson", "geojson"))
         val fc = geoJsonString!!.let { FeatureCollection.fromJson(it) }
@@ -99,6 +107,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
         mapView = findViewById(R.id.mapView)
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync(this)
+
+        // click the "coin" button ,if within 25 meters, the coins are collected
+        CollectButton.setOnClickListener{
+          var i:Intent = Intent(this,CollectCoinsActivity::class.java)
+          i.putExtra("geoJsonString",geoJsonString)
+          startActivity(i)
+        }
+
     }
 
     // to show the user location, you need to update your Google Play to the latest version
