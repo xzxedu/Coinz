@@ -34,6 +34,7 @@ class CollectCoinsActivity: AppCompatActivity(){
         get() = firestore.document("users/${FirebaseAuth.getInstance().currentUser?.uid
                 ?: throw NullPointerException("UID is null.")}")
 
+
     private val DOCUMENT_KEY= currentUserDocRef.id
     companion object
     {
@@ -108,7 +109,7 @@ class CollectCoinsActivity: AppCompatActivity(){
         }
      // send the coins and listen for success or failure
         if (currency !=  null){
-            firestoreCoinz!!.set(currency)
+            firestoreCoinz!!.update(currency)
                 .addOnSuccessListener { toast("Collect Coins Successfully!") } // anko
                 .addOnFailureListener { e -> Log.e(TAG, e.message) }
         }

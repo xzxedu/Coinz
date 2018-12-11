@@ -113,7 +113,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
                 return super.onOptionsItemSelected(item)
             }
             R.id.Wallet -> {
-                //TODO: intent startactivity to settings
+                var i:Intent = Intent(this,WalletActivity::class.java)
+                startActivity(i)
                 return super.onOptionsItemSelected(item)
             }
 

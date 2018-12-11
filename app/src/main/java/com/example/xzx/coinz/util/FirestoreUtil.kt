@@ -7,6 +7,7 @@ import android.util.Log
 import com.example.xzx.coinz.model.User
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -52,10 +53,12 @@ object FirestoreUtil {
         Log.d("currentDocpath", currentUserDocRef.path)
         currentUserDocRef.get()
                 .addOnSuccessListener {
-                  onComplete(it.toObject(User::class.java)!!)
-        //it.exists()
-    }
-    }
+                    onComplete(it.toObject(User::class.java)!!)
+                    //it.exists()
+                }
 
-
+    }
 }
+
+
+
