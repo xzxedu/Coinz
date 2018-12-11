@@ -38,7 +38,7 @@ class CollectCoinsActivity: AppCompatActivity(){
     companion object
     {
         private const val TAG = "CollectCoinsActivity"
-        private const val COLLECTION_KEY="User"
+        private const val COLLECTION_KEY="users"
         private val DOLR_FIELD = "DOLR"
         private val QUID_FIELD = "QUID"
         private val SHIL_FIELD = "SHIL"
@@ -65,17 +65,10 @@ class CollectCoinsActivity: AppCompatActivity(){
 
         var fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         var task = fusedLocationProviderClient.getLastLocation()
-//        task.addOnSuccessListener(object: OnSuccessListener<Location> {
-//            override fun onSuccess(currentlocation:Location) {
-//                if (currentlocation != null)
-//                {
-//                    //Write your implemenation here
-//                    )
-//                }
-//            } }}
         task.addOnSuccessListener { currentlocation: Location? ->
             // Got last known location. In some rare situations this can be null.
             if (currentlocation != null) {
+                var ifCollect: Boolean = false
                 val intent: Intent = getIntent()
                 val geoJson: String = intent.getStringExtra("geoJsonString")
                 val fc = geoJson.let { FeatureCollection.fromJson(it) }
@@ -89,12 +82,15 @@ class CollectCoinsActivity: AppCompatActivity(){
                             temp.setLatitude(p.latitude())
                             temp.setLongitude(p.longitude())
                             val distance = currentlocation.distanceTo(temp)
-                            if (distance <= 25 ){
+                            if (distance <= 25.00 ){
+                                ifCollect = true
                                 updateCoinsFirestore(f)
+                                break
                             }
-                            else  toast("over 25 meters away! Collection fails! ").show()
                         }
                     }
+                    if (ifCollect == false)
+                     toast("over 25 meters away! Collection fails! ")
                 }
             }
 
@@ -117,19 +113,4 @@ class CollectCoinsActivity: AppCompatActivity(){
                 .addOnFailureListener { e -> Log.e(TAG, e.message) }
         }
     }
-//
-//    private fun realtimeUpdateListener() {
-//        firestoreCoinz!!.addSnapshotListener { documentSnapshot, e ->
-//            when {
-//                e != null -> Log.e(TAG, e.message)
-//                documentSnapshot != null && documentSnapshot.exists() -> {
-//                with(documentSnapshot) {
-//                    val incoming = "${data?.get(NAME_FIELD)}:${data?.get(TEXT_FIELD)}"
-//                    incoming_message_text.text = incoming
-//                }
-//            }
-//            }
-//        }
-//    }
-
 }

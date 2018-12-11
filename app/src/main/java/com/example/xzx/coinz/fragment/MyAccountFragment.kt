@@ -88,13 +88,12 @@ class MyAccountFragment : Fragment() {
             pictureJustChanged = true
         }
     }
-
     override fun onStart() {
         super.onStart()
-        Log.d(tag,"onstart")
+        Log.d(tag,"print onstart")
         FirestoreUtil.getCurrentUser { user ->
             if (this@MyAccountFragment.isVisible) {
-                Log.d(tag,"usernamesave"+user.name)
+                Log.d(tag,"print usernamesave"+user.name)
                 editText_name.setText(user.name)
                 editText_bio.setText(user.bio)
                 if (!pictureJustChanged && user.profilePicturePath != null)

@@ -1,24 +1,17 @@
 package com.example.xzx.coinz
 
-import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import android.os.AsyncTask
 import android.os.Bundle
-import android.os.Environment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
+import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-//import com.mapbox.mapboxandroiddemo.R
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.location.LocationComponent
 import com.mapbox.mapboxsdk.location.LocationComponentOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
@@ -26,24 +19,15 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 
-import com.example.xzx.coinz.R.id.mapView
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.gson.JsonArray
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.style.layers.LineLayer
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
-import com.mapbox.mapboxsdk.style.light.Position
-import com.mapbox.geojson.Feature
-import com.mapbox.geojson.Geometry
 import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
-import kotlinx.android.synthetic.main.activity_map.*
-import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.startActivityForResult
 
 /**
@@ -57,8 +41,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     private var p: Point? = null
 
     private lateinit var geoJsonString:String
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -108,14 +90,41 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync(this)
 
-        // click the "coin" button ,if within 25 meters, the coins are collected
-        CollectButton.setOnClickListener{
-          var i:Intent = Intent(this,CollectCoinsActivity::class.java)
-          i.putExtra("geoJsonString",geoJsonString)
-          startActivity(i)
-        }
+        var mToolbar = findViewById(R.id.toolbar) as Toolbar
+        setSupportActionBar(mToolbar)
 
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_map,menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.CollectButton -> {
+                var i: Intent = Intent(this, CollectCoinsActivity::class.java)
+                i.putExtra("geoJsonString", geoJsonString)
+                startActivity(i)
+                return super.onOptionsItemSelected(item)
+            }
+            R.id.action_settings -> {
+                //TODO: intent startactivity to settings
+                return super.onOptionsItemSelected(item)
+            }
+            R.id.Wallet -> {
+                //TODO: intent startactivity to settings
+                return super.onOptionsItemSelected(item)
+            }
+
+            R.id.backgroundMode -> {
+                //TODO: intent startactivity to backgroundMode
+                return super.onOptionsItemSelected(item)
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
 
     // to show the user location, you need to update your Google Play to the latest version
     override fun onMapReady(mapboxMap: MapboxMap) {

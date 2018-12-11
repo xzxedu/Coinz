@@ -22,7 +22,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:minHeight = "?android:attr/actionBarSize"
+            app:title="Coinz Map"
+            app:logo= "@drawable/ic_fire_emoji"
+            app:theme="@style/AppTheme.NoActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -37,29 +41,22 @@
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp">
 
-        <ImageButton
-            android:id="@+id/CollectButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="Collect coins"
-            app:srcCompat="@drawable/ic_fire_emoji" />
     </com.mapbox.mapboxsdk.maps.MapView>
 
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:background="@color/mapboxGrayLight"
-        android:enabled="false"
-        android:text="@string/press_to_start"
-        android:textColor="@color/mapboxWhite"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
+    <!--<Button-->
+        <!--android:id="@+id/startButton"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="24dp"-->
+        <!--android:layout_marginEnd="24dp"-->
+        <!--android:layout_marginStart="24dp"-->
+        <!--android:background="@color/mapboxGrayLight"-->
+        <!--android:enabled="false"-->
+        <!--android:text="@string/press_to_start"-->
+        <!--android:textColor="@color/mapboxWhite"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
 
 
 </android.support.constraint.ConstraintLayout>
