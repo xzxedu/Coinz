@@ -6,15 +6,10 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
-import com.firebase.ui.auth.R.id.email
-import com.firebase.ui.auth.R.id.password
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
@@ -26,28 +21,33 @@ import com.google.gson.JsonObject
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
-import org.jetbrains.anko.alert
 import org.jetbrains.anko.toast
+
+
 
 class CollectCoinsActivity: AppCompatActivity(){
 
     private var mAuth: FirebaseAuth? = null
-    private var firestoreCoinz: DocumentReference? = null
+    private var locationDoc: DocumentReference? = null
     private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private val currentUserDocRef: DocumentReference
         get() = firestore.document("users/${FirebaseAuth.getInstance().currentUser?.uid
                 ?: throw NullPointerException("UID is null.")}")
     private val DOCUMENT_KEY= currentUserDocRef.id
     private var DocumentData= mutableMapOf<String, Any?>()
-    private var DolrNum:Float = 0f
-    private var QuidNum:Float = 0f
-    private var ShilNum:Float = 0f
-    private var PenyNum:Float = 0f
+    private var DolrString:String?= null
+    private var QuidString:String?= null
+    private var ShilString:String?= null
+    private var PenyString:String?= null
+    private var DolrNum:Float= 0f
+    private var QuidNum:Float= 0f
+    private var ShilNum:Float= 0f
+    private var PenyNum:Float= 0f
 
     companion object
     {
         private const val TAG = "CollectCoinsActivity"
-        private const val COLLECTION_KEY="users"
+        private const val COLLECTION_KEY="LocationCollected"
         private val DOLR_FIELD = "DOLR"
         private val QUID_FIELD = "QUID"
         private val SHIL_FIELD = "SHIL"
@@ -63,7 +63,7 @@ class CollectCoinsActivity: AppCompatActivity(){
                 .setTimestampsInSnapshotsEnabled(true)
                 .build()
         firestore?.firestoreSettings = settings
-        firestoreCoinz = firestore?.collection(COLLECTION_KEY)?.document(DOCUMENT_KEY)
+        locationDoc = firestore?.collection(COLLECTION_KEY)?.document(DOCUMENT_KEY)
         getCurrentUser(currentUserDocRef)
         // check location service permission
         if (ActivityCompat.checkSelfPermission(this, Manifest
@@ -80,6 +80,7 @@ class CollectCoinsActivity: AppCompatActivity(){
                 val geoJson: String = intent.getStringExtra("geoJsonString")
                 val fc = geoJson.let { FeatureCollection.fromJson(it) }
                 val features = fc?.features()
+                var PointNum = 0
                 features?.let {
                     for (f in it) {
                         val j = f.properties() as JsonObject
@@ -91,13 +92,14 @@ class CollectCoinsActivity: AppCompatActivity(){
                             val distance = currentlocation.distanceTo(temp)
                             if (distance <= 25.00 ){
                                 ifCollect = true
-                                updateCoinsFirestore(f)
+                                PointNum += 1
+                                updateCoinsFirestore(f,PointNum)
                                 break
                             }
                         }
                     }
                     if (ifCollect == false)
-                     toast("over 25 meters away! Collection fails! ")
+                     Toast.makeText(this,"over 25 meters away! Collection fails! ",Toast.LENGTH_LONG).show()
                 }
             }
 
@@ -111,10 +113,23 @@ class CollectCoinsActivity: AppCompatActivity(){
                 if (document != null) {
                     DocumentData = document.data!!
                     Log.d("wallet", "DocumentSnapshot data: " + DocumentData)
-                    DolrNum = DocumentData.get("DOLR").toString().toFloat()
-                    ShilNum = DocumentData.get("SHIL").toString().toFloat()
-                    PenyNum = DocumentData.get("PENY").toString().toFloat()
-                    QuidNum = DocumentData.get("QUID").toString().toFloat()
+                    DolrString = DocumentData.get("DOLR").toString()
+                    if (DolrString != null){
+                        val dolr = DolrString!!
+                        DolrNum = dolr.toFloat()}
+                    ShilString = DocumentData.get("SHIL").toString()
+                    if (ShilString != null){
+                        val shil = ShilString!!
+                        ShilNum = shil.toFloat()}
+                    PenyString = DocumentData.get("PENY").toString()
+                    if (PenyString != null){
+                        val peny = PenyString!!
+                        PenyNum = peny.toFloat()}
+                    QuidString = DocumentData.get("QUID").toString()
+                    if (DolrString != null){
+                        val quid = QuidString!!
+                        QuidNum = quid.toFloat()}
+
                 } else {
                     toast("No such document")
                 }
@@ -125,22 +140,36 @@ class CollectCoinsActivity: AppCompatActivity(){
 
     }
 
-    private fun updateCoinsFirestore(f: Feature) {
+    private fun updateCoinsFirestore(f: Feature,i:Int) {
         val j = f.properties() as JsonObject
-        var currency :Map<String,String> ?= null
+        var currencyNum :Map<String,String> ?= null
         var acquireValue = j.get("value").toString().replace('\"',' ').trim().toFloat()
+
         when(j.get("currency").toString().replace('\"',' ').trim()){
-            "DOLR" ->{ currency = mapOf(DOLR_FIELD to (acquireValue.plus(DolrNum)).toString())}
-            "SHIL" ->{ currency = mapOf(SHIL_FIELD to (acquireValue.plus(ShilNum)).toString())}
-            "PENY" ->{ currency = mapOf(PENY_FIELD to  (acquireValue.plus(PenyNum)).toString())}
-            "QUID" ->{ currency = mapOf(QUID_FIELD to  (acquireValue.plus(QuidNum)).toString())}
+            "DOLR" ->{ currencyNum = mapOf(DOLR_FIELD to DolrNum.plus(acquireValue).toString())}
+            "SHIL" ->{ currencyNum = mapOf(SHIL_FIELD to ShilNum.plus(acquireValue).toString())}
+            "PENY" ->{ currencyNum = mapOf(PENY_FIELD to PenyNum.plus(acquireValue).toString())}
+            "QUID" ->{ currencyNum = mapOf(QUID_FIELD to QuidNum.plus(acquireValue).toString())}
         }
+        // record their id
+        var locationdoc = mapOf(
+                "id" to (j.get("id").toString()),
+                "value" to (j.get("value").toString()),
+                "currency" to (j.get("currency").toString())
+        )
         // send the coins and listen for success or failure
-        if (currency !=  null){
-            firestoreCoinz!!.update(currency)
-                    .addOnSuccessListener { toast("Collect Coins Successfully!") } // anko
+        if (currencyNum !=  null){
+           currentUserDocRef!!.update(currencyNum)
+        }
+        if (locationdoc!=null){
+            var toastString = "Collect Coins Successfully! Rest Coins:" + i.toString()
+            locationDoc!!.update(locationdoc)
+                    .addOnSuccessListener { Toast.makeText(this,
+                            toastString,Toast.LENGTH_LONG).show()
+                    } // anko
                     .addOnFailureListener { e -> Log.e(TAG, e.message) }
         }
+
     }
 
 }

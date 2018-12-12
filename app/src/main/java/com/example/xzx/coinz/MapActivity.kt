@@ -114,6 +114,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
             }
             R.id.Wallet -> {
                 var i:Intent = Intent(this,WalletActivity::class.java)
+                i.putExtra("geoJsonString", geoJsonString)
                 startActivity(i)
                 return super.onOptionsItemSelected(item)
             }

@@ -16,9 +16,16 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.JsonObject
+import com.mapbox.geojson.FeatureCollection
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.design.snackbar
+import org.json.JSONObject
+import org.json.JSONTokener
 import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -29,11 +36,10 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
     private val preferencesFile = "MyPrefsFile" // for storing preferences
     var geoJsonString:String?= null
 
-//    private var networkChangeReceiver:NetworkChangeReceiver?=null
+    //    private var networkChangeReceiver:NetworkChangeReceiver?=null
     private var progressbar: ProgressBar?=null
     private var textview: TextView?=null
     private var networkChangeReceiver:NetworkChangeReceiver?=null
-
 
     override fun downloadComplete(result: String) {
         geoJsonString = result

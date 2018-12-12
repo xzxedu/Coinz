@@ -1,8 +1,10 @@
 package com.example.xzx.coinz
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.TextView
 import com.example.xzx.coinz.model.User
 import com.google.android.gms.tasks.OnCompleteListener
@@ -14,6 +16,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import kotlinx.android.synthetic.main.activity_wallet.*
 
 class WalletActivity : AppCompatActivity() {
     private var mAuth: FirebaseAuth? = null
@@ -27,6 +30,7 @@ class WalletActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wallet)
+        setSupportActionBar(toolbar_wallet)
         mAuth = FirebaseAuth.getInstance()
         // Use com.google.firebase.Timestamp objects instead of java.util.Date objects
         val settings = FirebaseFirestoreSettings.Builder()
@@ -35,6 +39,14 @@ class WalletActivity : AppCompatActivity() {
         firestore?.firestoreSettings = settings
 
         getCurrentUser(currentUserDocRef)
+
+        val bankButton: Button = findViewById(R.id.BankButton)
+        bankButton.setOnClickListener{
+            val geoJsonString: String = getIntent().getStringExtra("geoJsonString")
+            val intent = Intent(this, BankActivity::class.java)
+            intent.putExtra("geoJsonString", geoJsonString)
+            startActivity(intent)
+        }
     }
 
     fun getCurrentUser(currentUserDocRef: DocumentReference){
