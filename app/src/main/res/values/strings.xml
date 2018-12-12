@@ -11,6 +11,7 @@
     <string name="title_activity_download">DownloadActivity</string>
     <string name="title_activity_rank">RankActivity</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_bank">CENTER BANK</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -29,14 +30,15 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_main2">Main2Activity</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="title_activity_bank">BankActivity</string>
+    <!--TODO-->
+	<string name="btn_show_toast">Show Toast</string>
+
+	<string name="btn_move_to_next_activity">Move to next Activity</string>
+	<string name="btn_share_to_apps">Share to Other Apps</string>
+	<string name="btn_hobbies">Show my Hobbies</string>
+
+	<string name="et_enter_msg">Enter a Message</string>
+
+	<string name="btn_was_clicked">Button was clicked !</string>
 
 </resources>

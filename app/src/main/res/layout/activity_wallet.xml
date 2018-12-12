@@ -195,7 +195,6 @@
     android:layout_marginEnd="24dp"
     android:layout_marginStart="24dp"
     android:background="@color/mapboxBlue"
-    android:enabled="false"
     android:text="CENTER BANK: Deposit, Exchange"
     android:textColor="@color/mapboxWhite"
     app:layout_constraintBottom_toBottomOf="parent"

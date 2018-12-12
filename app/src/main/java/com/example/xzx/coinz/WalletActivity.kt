@@ -40,7 +40,7 @@ class WalletActivity : AppCompatActivity() {
 
         getCurrentUser(currentUserDocRef)
 
-        val bankButton: Button = findViewById(R.id.BankButton)
+        val bankButton = findViewById<Button>(R.id.BankButton)
         bankButton.setOnClickListener{
             val geoJsonString: String = getIntent().getStringExtra("geoJsonString")
             val intent = Intent(this, BankActivity::class.java)

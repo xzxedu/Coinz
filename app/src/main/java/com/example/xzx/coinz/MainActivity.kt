@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         navigation.setOnNavigationItemSelectedListener{
             when (it.itemId){
                 R.id.navigation_people -> {
-                    //TODO: show people fragment
+                    startActivity<Wallet2Activity>()
                     true
                 }
                 R.id.navigation_my_account -> {
