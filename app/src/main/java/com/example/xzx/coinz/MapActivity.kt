@@ -69,11 +69,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
                         "#0000ff" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
                         "#ffdf00" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)
                     }
-                    mapboxMap!!.addMarker(MarkerOptions()
-                            .title(j.get("currency").toString())
-                            .snippet(j.get("marker-symbol").toString())
-                            .icon(icon)
-                            .position(LatLng(p!!.latitude(), p!!.longitude())))
+                    var marker = mapboxMap!!.addMarker(MarkerOptions()
+                                          .title(j.get("currency").toString())
+                                          .snippet(j.get("marker-symbol").toString())
+                                          .icon(icon)
+                                          .position(LatLng(p!!.latitude(), p!!.longitude())))
                 }
             }
         }

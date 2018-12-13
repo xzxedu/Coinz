@@ -1,6 +1,7 @@
 package com.example.xzx.coinz
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -36,6 +37,7 @@ class CollectCoinsActivity: AppCompatActivity(){
     private val TAG = "CollectCoinsActivity"
     private val COLLECTION_KEY=currentUserDocRef.id
     private var DOCUMENT_KEY:String ?= null
+    private var PointNum = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +63,6 @@ class CollectCoinsActivity: AppCompatActivity(){
                 val geoJson: String = intent.getStringExtra("geoJsonString")
                 val fc = geoJson.let { FeatureCollection.fromJson(it) }
                 val features = fc?.features()
-                var PointNum = 0
                 features?.let {
                     for (f in it) {
                         val j = f.properties() as JsonObject
@@ -107,6 +108,8 @@ class CollectCoinsActivity: AppCompatActivity(){
                             toastString,Toast.LENGTH_LONG).show()
                     } // anko
                     .addOnFailureListener { e -> Log.e(TAG, e.message) }
+
+            //  TODO :edit the local sharedPreference geoJsonString
         }
 
     }
