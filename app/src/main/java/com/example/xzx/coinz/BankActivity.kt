@@ -21,13 +21,6 @@ import org.json.JSONTokener
 
 class BankActivity : AppCompatActivity() {
 
-    private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance()}
-    private var ratesData= mutableMapOf<String, Any?>()
-    private lateinit var PENY_rate:String
-    private lateinit var DOLR_rate:String
-    private lateinit var SHIL_rate:String
-    private lateinit var QUID_rate:String
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bank)

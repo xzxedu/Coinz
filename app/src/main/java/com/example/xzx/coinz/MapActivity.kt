@@ -1,13 +1,26 @@
 package com.example.xzx.coinz
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
+import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import com.google.android.gms.location.LocationServices
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
@@ -26,6 +39,7 @@ import com.mapbox.mapboxsdk.style.layers.LineLayer
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
 import com.google.gson.JsonObject
+import com.mapbox.geojson.Feature
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
@@ -35,17 +49,26 @@ import java.util.ArrayList
 /**
  * Use the Location component to easily add a device location "puck" to a Mapbox map.
  */
-class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener{
+class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListener {
+
     private val tag ="MapActivity"
     private var permissionsManager: PermissionsManager? = null
     private var mapboxMap: MapboxMap? = null
     private var mapView: MapView? = null
     private var p: Point? = null
-    var markerInit :Marker?= null
-//    var markerList = listOf(markerInit)
-    var markerList = arrayListOf(markerInit)
-
+    private var markerList = ArrayList<Marker>()
     private lateinit var geoJsonString:String
+    // collect coins function
+    private var mAuth: FirebaseAuth? = null
+    private var  UserCollectedCoins: DocumentReference? = null
+    private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+    private val currentUserDocRef: DocumentReference
+        get() = firestore.document("users/${FirebaseAuth.getInstance().currentUser?.uid
+                ?: throw NullPointerException("UID is null.")}")
+    private val COLLECTION_KEY=currentUserDocRef.id
+    private var DOCUMENT_KEY:String ?= null
+    private var PointNum = 0
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -63,24 +86,30 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
         features?.let {
             for (f in it) {
                 val j = f.properties() as JsonObject
-                if (f.geometry() is Point) {
-                    p = f.geometry() as Point
-                     // Create an Icon object for the marker to use
-                    color = j.get("marker-color").toString()
-                    color = color.replace('\"',' ').trim()
-                    when (color){
-                        "#ff0000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.drawable.mapbox_marker_icon_default)
-                        "#008000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_green)
-                        "#0000ff" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
-                        "#ffdf00" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)
-                    }
-                    var marker = mapboxMap!!.addMarker(MarkerOptions()
+                // undisplay the collected coins from firestore
+                firestore.collection(currentUserDocRef.id).document(j.get("id").toString()
+                        .replace('\"',' ').trim()).get()
+                        .addOnCompleteListener {
+                            //if (it.result!!.exists() == false){
+                                if (f.geometry() is Point) {
+                                   p = f.geometry() as Point
+                                   // Create an Icon object for the marker to use
+                                   color = j.get("marker-color").toString().replace('\"',' ').trim()
+                                   when (color){
+                                   "#ff0000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.drawable.mapbox_marker_icon_default)
+                                   "#008000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_green)
+                                   "#0000ff" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
+                                   "#ffdf00" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)
+                                }
+                                var marker = mapboxMap!!.addMarker(MarkerOptions()
                                           .title(j.get("currency").toString())
                                           .snippet(j.get("marker-symbol").toString())
                                           .icon(icon)
                                           .position(LatLng(p!!.latitude(), p!!.longitude())))
-                    markerList .add(marker)
-                }
+                                markerList .add(marker)
+                                }
+                            //}
+                        }
             }
         }
     }
@@ -109,12 +138,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.CollectButton -> {
-                //TODO ARRAYLIST OR LIST? PARCEBLE
-
-                val i: Intent = Intent(this, CollectCoinsActivity::class.java)
-//                i.putExtra("geoJsonString", geoJsonString)
-//                i.putExtra("markerList",markerList)
-                startActivity(i)
+                collectCoins()
                 return super.onOptionsItemSelected(item)
             }
             R.id.action_settings -> {
@@ -220,4 +244,72 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
         mapView?.onLowMemory()
     }
 
-}
+    fun collectCoins(){
+                mAuth = FirebaseAuth.getInstance()
+                // Use com.google.firebase.Timestamp objects instead of java.util.Date objects
+                val settings = FirebaseFirestoreSettings.Builder()
+                        .setTimestampsInSnapshotsEnabled(true)
+                        .build()
+                firestore?.firestoreSettings = settings
+                // check location service permission
+                if (ActivityCompat.checkSelfPermission(this, Manifest
+                                .permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                    return
+                // TODO DELTE THE CLOUD FIRESTORE POINT TO BE DISPLAYED
+                var fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+                var task = fusedLocationProviderClient.getLastLocation()
+                task.addOnSuccessListener { currentlocation: Location? ->
+                    // Got last known location. In some rare situations this can be null.
+                    if (currentlocation != null) {
+                        var ifCollect: Boolean = false
+                        val fc = geoJsonString.let { FeatureCollection.fromJson(it) }
+                        val features = fc!!.features()
+                        features!!.let {
+                            for (f in it) {
+                                val j = f.properties() as JsonObject
+                                if (f.geometry() is Point) {
+                                    val p = f.geometry() as Point
+                                    val temp = Location(LocationManager.GPS_PROVIDER)
+                                    temp.setLatitude(p.latitude())
+                                    temp.setLongitude(p.longitude())
+                                    val distance = currentlocation.distanceTo(temp)
+                                    if (distance <= 25.00 ){
+                                        ifCollect = true
+                                        updateCoinsFirestore(f,PointNum)
+                                        // remove collected points Marker
+                                        this@MapActivity.mapboxMap!!.removeMarker(markerList.get(PointNum))
+                                        PointNum += 1
+                                        break
+                                    }
+                                }
+                            }
+                            if (ifCollect == false)
+                                Toast.makeText(this,"over 25 meters away! Collection fails! ",Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                }
+            }
+
+            private fun updateCoinsFirestore(f: Feature, i:Int) {
+                val j = f.properties() as JsonObject
+                DOCUMENT_KEY = j.get("id").toString().replace('\"',' ').trim()
+                var documentKey = DOCUMENT_KEY!!
+                UserCollectedCoins = firestore?.collection(COLLECTION_KEY)?.document(documentKey)
+                // record their id
+                var PositionInf = mapOf(
+                        "id" to (j.get("id").toString()),
+                        "value" to (j.get("value").toString()),
+                        "currency" to (j.get("currency").toString())
+                )
+                // send the coins and listen for success or failure
+                if (PositionInf!=null){
+                    var toastString = "Collect Coins Successfully! Rest Coins:" + (50-i).toString()
+                    UserCollectedCoins!!.set(PositionInf)
+                            .addOnSuccessListener { Toast.makeText(this,
+                                    toastString,Toast.LENGTH_LONG).show()
+                            } // anko
+                            .addOnFailureListener { e -> Log.e("collectCoinsErro!", e.message) }
+                }
+            }
+        }

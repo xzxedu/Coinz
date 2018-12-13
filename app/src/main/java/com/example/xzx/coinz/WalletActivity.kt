@@ -30,19 +30,11 @@ class WalletActivity : AppCompatActivity() {
         setupRecyclerView()
     }
 
-    fun downloadCollectInf():List<Wallet>{
-        var wallet = Wallet("","","")
-        var data = listOf(wallet)
-        var newWallet: Wallet?= null
-        firestoreInstance.collection(currentUserDocRef.id).get()
-                .addOnSuccessListener { documents ->
-                    for (document in documents){
-                        newWallet =document.toObject(Wallet::class.java)
-                        data += (newWallet)!!
-                    }
-                }
-        return data
-    }
+//    fun downloadCollectInf():ArrayList<Wallet>{
+//
+//        Log.d("3",data.toString())
+//        return data
+//    }
 
 
     private fun setupRecyclerView() {
@@ -50,9 +42,20 @@ class WalletActivity : AppCompatActivity() {
         layoutManager.orientation = LinearLayoutManager.VERTICAL
         var recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = layoutManager
-        var data = downloadCollectInf()
-        val adapter= WalletAdapter(this,data)
-        recyclerView?.adapter = adapter
-    }
+        var data = arrayListOf<Wallet>()
+        var newWallet: Wallet?= null
+        firestoreInstance.collection(currentUserDocRef.id).get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents){
+                        newWallet =document.toObject(Wallet::class.java)
+                        Log.d("1newWallet!!",newWallet.toString())
+                        data .add (document.toObject(Wallet::class.java))!!
+                        Log.d("2acquiredWallet",data.toString())
+                    }
 
+                    Log.d("3data",data.toString())
+                    val adapter= WalletAdapter(this,data)
+                    recyclerView?.adapter = adapter
+                }
+    }
 }

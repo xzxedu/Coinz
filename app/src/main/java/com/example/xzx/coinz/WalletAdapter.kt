@@ -17,12 +17,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firestore.admin.v1beta1.Index
 import kotlinx.android.synthetic.main.list_item.view.*
 import kotlinx.android.synthetic.main.share_dialog.view.*
 import org.jetbrains.anko.commit
 import java.util.Collections.list
 
-class WalletAdapter(val context: Context,val DATA:List<Wallet>) :
+class WalletAdapter(val context: Context,val DATA:ArrayList<Wallet>) :
         RecyclerView.Adapter<WalletAdapter.MyViewHolder>() {
     private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private val currentUserDocRef: DocumentReference
@@ -45,13 +46,14 @@ class WalletAdapter(val context: Context,val DATA:List<Wallet>) :
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val wallet = data[position]
+        val wallet = data.get(position)
+        Log.d("currentWallet",wallet.toString())
         holder.setData(wallet,position)
     }
 
     inner class MyViewHolder(itemView: View)
         : RecyclerView.ViewHolder(itemView) {
-        var currentHobby: Wallet? = null
+        var currentWallet =Wallet("","","")
         var currentPosition: Int = 0
 
         init {
@@ -65,11 +67,11 @@ class WalletAdapter(val context: Context,val DATA:List<Wallet>) :
                 Toast.makeText(context,"Please click the share or deposit buttons on the bar!",Toast.LENGTH_LONG).show()
             }
             var equalGold:Float =0f
-            when (currentHobby!!.currency){
-                "DOLR" -> equalGold = currentHobby!!.value.toFloat() * dolr
-                "PENY" -> equalGold = currentHobby!!.value.toFloat() * peny
-                "SHIL" -> equalGold = currentHobby!!.value.toFloat() * shil
-                "QUID" -> equalGold = currentHobby!!.value.toFloat() * quid
+            when (currentWallet!!.currency){
+                "DOLR" -> equalGold = currentWallet!!.value.toFloat() * dolr
+                "PENY" -> equalGold = currentWallet!!.value.toFloat() * peny
+                "SHIL" -> equalGold = currentWallet!!.value.toFloat() * shil
+                "QUID" -> equalGold = currentWallet!!.value.toFloat() * quid
             }
             itemView.imgShare.setOnClickListener {
                 //Inflate the dialog with custom view
@@ -90,17 +92,19 @@ class WalletAdapter(val context: Context,val DATA:List<Wallet>) :
                                 if (task.isSuccessful) {
                                     val document = task.result
                                     if (document != null) {
-                                        var newGoldNum = document.data!!.get("goldCoins").toString().toFloat().plus(equalGold)
+                                        var newGoldNum = document.data?.get("goldCoins").toString().toFloat().plus(equalGold)
                                         var map = mapOf("goldCoins" to newGoldNum)
                                         firestoreInstance.collection("BANK Account").document(userID).update(map)
-                                                .addOnSuccessListener{Toast.makeText(context, "Send successfully", Toast.LENGTH_LONG).show()}
+                                                .addOnSuccessListener{
+                                                    removeItem(currentPosition)
+                                                    Toast.makeText(context, "Send successfully", Toast.LENGTH_LONG).show()}
                                                 .addOnFailureListener { Toast.makeText(context, "Sharing fails! Try again!", Toast.LENGTH_LONG).show()
                                                 }
                                     }
                                 }
                             })
                     //delete shared coins information on the firestore
-                    firestoreInstance.collection(currentUserDocRef.id).document(currentHobby!!.id)
+                    firestoreInstance.collection(currentUserDocRef.id).document(currentWallet!!.id)
                             .delete()
                             .addOnSuccessListener { Toast.makeText(context, "Sharing successfully", Toast.LENGTH_LONG).show() }
                             .addOnFailureListener { Toast.makeText(context, "Sharing fails! Try again!", Toast.LENGTH_LONG).show() }
@@ -119,13 +123,16 @@ class WalletAdapter(val context: Context,val DATA:List<Wallet>) :
                                         var newGoldNum = document.data!!.get("goldCoins").toString().toFloat().plus(equalGold)
                                         var map = mapOf("goldCoins" to newGoldNum)
                                         firestoreInstance.collection("BANK Account").document(currentUserDocRef.id).update(map)
-                                                .addOnSuccessListener{Toast.makeText(context, "Deposit successfully", Toast.LENGTH_LONG).show()}
+                                                .addOnSuccessListener{
+                                                    removeItem(currentPosition)
+                                                    Toast.makeText(context, "Deposit successfully", Toast.LENGTH_LONG).show()}
                                                 .addOnFailureListener { Toast.makeText(context, "Try again!", Toast.LENGTH_LONG).show()
                                                 }
                                     }
                                 }
                             })
-                    firestoreInstance.collection(currentUserDocRef.id).document(currentHobby!!.id)
+                    Log.d("currentWalletId",currentWallet.id)
+                    firestoreInstance.collection(currentUserDocRef.id).document(currentWallet!!.id)
                             .delete()
                             .addOnSuccessListener { Toast.makeText(context, "Deposit successfully", Toast.LENGTH_LONG).show() }
                             .addOnFailureListener { Toast.makeText(context, "Try again!", Toast.LENGTH_LONG).show() }
@@ -138,13 +145,16 @@ class WalletAdapter(val context: Context,val DATA:List<Wallet>) :
             }
             //TODO 让操作完 的item消失
         }
-    fun setData(hobby: Wallet?, pos: Int) {
-            hobby?.let {
-                itemView.txvTitle.text = hobby.currency
-                itemView.textview_currency.text = hobby.value
+    fun setData(wallet: Wallet, pos: Int) {
+        wallet?.let {
+                itemView.txvTitle.text = wallet.currency
+                itemView.textview_currency.text = wallet.value
             }
-            this.currentHobby = hobby
+            this.currentWallet = wallet
             this.currentPosition = pos
         }
+    fun removeItem(position: Int){
+        DATA.removeAt(position)
+    }
     }
 }

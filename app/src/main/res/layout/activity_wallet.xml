@@ -21,7 +21,7 @@
             android:minHeight="?android:attr/actionBarSize"
             app:logo="@drawable/ic_account_balance_wallet_black_24dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme.NoActionBar"
             app:title="My Currency Wallet" />
     </android.support.design.widget.AppBarLayout>
 

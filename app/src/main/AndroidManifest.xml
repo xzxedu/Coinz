@@ -39,10 +39,6 @@
             android:label="MapActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".CollectCoinsActivity"
-            android:label="CollectCoinsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".DownloadActivity"
             android:label="@string/title_activity_download"
             android:theme="@style/AppTheme.NoActionBar" />

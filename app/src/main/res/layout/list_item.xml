@@ -38,7 +38,7 @@
             android:layout_width="30dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:background="?:attr/actionModeSplitBackground"
+            android:background="?attr/actionModeSplitBackground"
             android:src="@android:drawable/ic_menu_share"
             android:tint="#eeeeee" />
 
@@ -49,7 +49,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_gravity="center"
-            android:background="?:attr/actionModeSplitBackground"
+            android:background="?attr/actionModeSplitBackground"
             android:src="@android:drawable/ic_menu_add"
             android:tint="#eeeeee" />
 
