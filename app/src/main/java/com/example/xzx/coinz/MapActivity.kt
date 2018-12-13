@@ -42,7 +42,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     private var mapView: MapView? = null
     private var p: Point? = null
     var markerInit :Marker?= null
-    var markerList = listOf(markerInit)
+//    var markerList = listOf(markerInit)
+    var markerList = arrayListOf(markerInit)
 
     private lateinit var geoJsonString:String
 
@@ -78,7 +79,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
                                           .snippet(j.get("marker-symbol").toString())
                                           .icon(icon)
                                           .position(LatLng(p!!.latitude(), p!!.longitude())))
-                    markerList += marker
+                    markerList .add(marker)
                 }
             }
         }
@@ -108,11 +109,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.CollectButton -> {
-                //TODO ARRAYLIST OR LIST?
-                var selItemArray:ArrayList<Marker> = markerList
+                //TODO ARRAYLIST OR LIST? PARCEBLE
+
                 val i: Intent = Intent(this, CollectCoinsActivity::class.java)
-                i.putExtra("geoJsonString", geoJsonString)
-                i.putExtra("markerList",markerList.toString())
+//                i.putExtra("geoJsonString", geoJsonString)
+//                i.putExtra("markerList",markerList)
                 startActivity(i)
                 return super.onOptionsItemSelected(item)
             }

@@ -48,9 +48,7 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
                 remove("geoJsonString")
             }
             putString("geoJsonString",geoJsonString)
-            commit()
-
-        }
+            commit() }
         //save today's currency in the shared Preference
         val geoJsonString: String = getIntent().getStringExtra("geoJsonString")
         // upload rates to the firecloud
@@ -61,6 +59,7 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
                putFloat("SHIL", rates.get("SHIL").toString().toFloat())
                putFloat("QUID",rates.get("QUID").toString().toFloat())
                putFloat("PENY" , rates.get("PENY").toString().toFloat())
+               putInt("SavedCoins",0)
             commit()
         }
         //Log.i(tag,geoJsonString)

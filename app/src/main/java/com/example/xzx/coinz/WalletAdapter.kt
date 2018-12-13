@@ -19,6 +19,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.list_item.view.*
 import kotlinx.android.synthetic.main.share_dialog.view.*
+import org.jetbrains.anko.commit
 import java.util.Collections.list
 
 class WalletAdapter(val context: Context,val DATA:List<Wallet>) :
@@ -63,6 +64,13 @@ class WalletAdapter(val context: Context,val DATA:List<Wallet>) :
             itemView.setOnClickListener {
                 Toast.makeText(context,"Please click the share or deposit buttons on the bar!",Toast.LENGTH_LONG).show()
             }
+            var equalGold:Float =0f
+            when (currentHobby!!.currency){
+                "DOLR" -> equalGold = currentHobby!!.value.toFloat() * dolr
+                "PENY" -> equalGold = currentHobby!!.value.toFloat() * peny
+                "SHIL" -> equalGold = currentHobby!!.value.toFloat() * shil
+                "QUID" -> equalGold = currentHobby!!.value.toFloat() * quid
+            }
             itemView.imgShare.setOnClickListener {
                 //Inflate the dialog with custom view
                 val mDialogView = LayoutInflater.from(context).inflate(R.layout.share_dialog,null)
@@ -75,14 +83,6 @@ class WalletAdapter(val context: Context,val DATA:List<Wallet>) :
                 mDialogView.dialogShareBtn.setOnClickListener{
                     mAlertDialog.dismiss()
                     val userID= mDialogView.dialogID.text.toString()
-                    var equalGold:Float =0f
-                    when (currentHobby!!.currency){
-                        "DOLR" -> equalGold = currentHobby!!.value.toFloat() * dolr
-                        "PENY" -> equalGold = currentHobby!!.value.toFloat() * peny
-                        "SHIL" -> equalGold = currentHobby!!.value.toFloat() * shil
-                        "QUID" -> equalGold = currentHobby!!.value.toFloat() * quid
-                    }
-
                     // transfer the money to entered userID
                     firestoreInstance.collection("BANK Account")
                             .document(userID).get()
@@ -106,7 +106,37 @@ class WalletAdapter(val context: Context,val DATA:List<Wallet>) :
                             .addOnFailureListener { Toast.makeText(context, "Sharing fails! Try again!", Toast.LENGTH_LONG).show() }
                 }
             }
-            //TODO save in bank activity for maximum 25
+            itemView.imgSave.setOnClickListener{
+                val sharedPref = context.getSharedPreferences("Downloadmap",Context.MODE_PRIVATE)
+                var saveNum = sharedPref.getInt("SavedCoins",0)
+                if (saveNum <=25 ) {
+                    firestoreInstance.collection("BANK Account")
+                            .document(currentUserDocRef.id).get()
+                            .addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                                if (task.isSuccessful) {
+                                    val document = task.result
+                                    if (document != null) {
+                                        var newGoldNum = document.data!!.get("goldCoins").toString().toFloat().plus(equalGold)
+                                        var map = mapOf("goldCoins" to newGoldNum)
+                                        firestoreInstance.collection("BANK Account").document(currentUserDocRef.id).update(map)
+                                                .addOnSuccessListener{Toast.makeText(context, "Deposit successfully", Toast.LENGTH_LONG).show()}
+                                                .addOnFailureListener { Toast.makeText(context, "Try again!", Toast.LENGTH_LONG).show()
+                                                }
+                                    }
+                                }
+                            })
+                    firestoreInstance.collection(currentUserDocRef.id).document(currentHobby!!.id)
+                            .delete()
+                            .addOnSuccessListener { Toast.makeText(context, "Deposit successfully", Toast.LENGTH_LONG).show() }
+                            .addOnFailureListener { Toast.makeText(context, "Try again!", Toast.LENGTH_LONG).show() }
+                    saveNum +=1
+                    sharedPref.edit().putInt("SavedCoins",saveNum)
+                    sharedPref.edit().commit()
+                }
+                else
+                    Toast.makeText(context,"You have already saved 25 Coins today!",Toast.LENGTH_LONG).show()
+            }
+            //TODO 让操作完 的item消失
         }
     fun setData(hobby: Wallet?, pos: Int) {
             hobby?.let {

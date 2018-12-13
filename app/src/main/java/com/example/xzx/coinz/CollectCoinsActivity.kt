@@ -62,7 +62,7 @@ class CollectCoinsActivity: AppCompatActivity(){
                 var ifCollect: Boolean = false
                 val intent: Intent = getIntent()
                 val geoJson: String = intent.getStringExtra("geoJsonString")
-                val markerList:List<Marker> = intent.getStringExtra("markerList").toList()
+                val markerList:List<Marker> = intent.getParcelableArrayListExtra<>("markerList")
                 val fc = geoJson.let { FeatureCollection.fromJson(it) }
                 val features = fc?.features()
                 features?.let {
