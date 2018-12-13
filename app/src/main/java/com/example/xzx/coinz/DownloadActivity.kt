@@ -49,6 +49,19 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
             }
             putString("geoJsonString",geoJsonString)
             commit()
+
+        }
+        //save today's currency in the shared Preference
+        val geoJsonString: String = getIntent().getStringExtra("geoJsonString")
+        // upload rates to the firecloud
+        var jsonObject = JSONTokener(geoJsonString).nextValue() as JSONObject
+        val rates = jsonObject.getJSONObject("rates")
+        with (sharedPref.edit()){
+               putFloat("DOLR", rates.get("DOLR").toString().toFloat())
+               putFloat("SHIL", rates.get("SHIL").toString().toFloat())
+               putFloat("QUID",rates.get("QUID").toString().toFloat())
+               putFloat("PENY" , rates.get("PENY").toString().toFloat())
+            commit()
         }
         //Log.i(tag,geoJsonString)
         var intent = Intent() // Obtain values from previous activity
@@ -91,7 +104,7 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
                     if ((sharedPref.contains("geoJsonString")) == false){
                         Log.d("downloadingFail!!!!",sharedPref.toString())
                     }
-                    geoJsonString = getSharedPreferences("DownloadMap",Context.MODE_PRIVATE).
+                    geoJsonString = getSharedPreferences("Downloadmap",Context.MODE_PRIVATE).
                                                              getString("geoJsonString","")
                     var intent = Intent() // Obtain values from previous activity
                     intent.putExtra("geostring", geoJsonString)
@@ -114,7 +127,7 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
     override fun onStop() {
         super.onStop()
         // All objects are from android.context.Context
-        val settings = getSharedPreferences("DownloadMap", Context.MODE_PRIVATE)
+        val settings = getSharedPreferences("Downloadmap", Context.MODE_PRIVATE)
         // We need an Editor object to make preference changes.
         val editor = settings.edit()
         editor.putString("lastDownloadDate",  LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")))

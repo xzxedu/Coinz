@@ -28,7 +28,9 @@ import com.mapbox.geojson.Point
 import com.google.gson.JsonObject
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
+import com.mapbox.mapboxsdk.annotations.Marker
 import org.jetbrains.anko.startActivityForResult
+import java.util.ArrayList
 
 /**
  * Use the Location component to easily add a device location "puck" to a Mapbox map.
@@ -39,6 +41,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     private var mapboxMap: MapboxMap? = null
     private var mapView: MapView? = null
     private var p: Point? = null
+    var markerInit :Marker?= null
+    var markerList = listOf(markerInit)
 
     private lateinit var geoJsonString:String
 
@@ -74,6 +78,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
                                           .snippet(j.get("marker-symbol").toString())
                                           .icon(icon)
                                           .position(LatLng(p!!.latitude(), p!!.longitude())))
+                    markerList += marker
                 }
             }
         }
@@ -103,8 +108,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, PermissionsListener
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.CollectButton -> {
-                var i: Intent = Intent(this, CollectCoinsActivity::class.java)
+                //TODO ARRAYLIST OR LIST?
+                var selItemArray:ArrayList<Marker> = markerList
+                val i: Intent = Intent(this, CollectCoinsActivity::class.java)
                 i.putExtra("geoJsonString", geoJsonString)
+                i.putExtra("markerList",markerList.toString())
                 startActivity(i)
                 return super.onOptionsItemSelected(item)
             }

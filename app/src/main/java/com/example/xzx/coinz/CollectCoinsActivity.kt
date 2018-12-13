@@ -22,6 +22,7 @@ import com.google.gson.JsonObject
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Point
+import com.mapbox.mapboxsdk.annotations.Marker
 import org.jetbrains.anko.toast
 
 
@@ -52,7 +53,7 @@ class CollectCoinsActivity: AppCompatActivity(){
         if (ActivityCompat.checkSelfPermission(this, Manifest
                         .permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             return
-
+        // TODO DELTE THE CLOUD FIRESTORE POINT TO BE DISPLAYED
         var fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         var task = fusedLocationProviderClient.getLastLocation()
         task.addOnSuccessListener { currentlocation: Location? ->
@@ -61,6 +62,7 @@ class CollectCoinsActivity: AppCompatActivity(){
                 var ifCollect: Boolean = false
                 val intent: Intent = getIntent()
                 val geoJson: String = intent.getStringExtra("geoJsonString")
+                val markerList:List<Marker> = intent.getStringExtra("markerList").toList()
                 val fc = geoJson.let { FeatureCollection.fromJson(it) }
                 val features = fc?.features()
                 features?.let {
@@ -108,10 +110,6 @@ class CollectCoinsActivity: AppCompatActivity(){
                             toastString,Toast.LENGTH_LONG).show()
                     } // anko
                     .addOnFailureListener { e -> Log.e(TAG, e.message) }
-
-            //  TODO :edit the local sharedPreference geoJsonString
         }
-
     }
-
 }

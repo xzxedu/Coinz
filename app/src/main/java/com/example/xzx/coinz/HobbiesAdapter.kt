@@ -3,6 +3,7 @@ package com.example.xzx.coinz
 import android.content.Context
 import android.content.Intent
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ class HobbiesAdapter(val context: Context, private val hobbies: List<Hobby>) :
     companion object {
         val TAG: String = HobbiesAdapter::class.java.simpleName
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.list_item, parent, false)

@@ -19,8 +19,15 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/dialogSavenBtn"
-            android:text="Save"/>
+            android:id="@+id/dialogShareBtn"
+            style="@style/Base.Widget.AppCompat.Button.Colored"
+            android:text="SHARE"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dialogCanelBtn"
+            style="@style/Base.Widget.AppCompat.Button.Colored"
+            android:text="CANCEL"/>
     </LinearLayout>
 
 </LinearLayout>
