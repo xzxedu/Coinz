@@ -43,14 +43,12 @@ class WalletActivity : AppCompatActivity() {
         var recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = layoutManager
         var data = arrayListOf<Wallet>()
-        var newWallet: Wallet?= null
+        //var newWallet: Wallet?= null
         firestoreInstance.collection(currentUserDocRef.id).get()
                 .addOnSuccessListener { documents ->
                     for (document in documents){
-                        newWallet =document.toObject(Wallet::class.java)
-                        Log.d("1newWallet!!",newWallet.toString())
+                        //newWallet =document.toObject(Wallet::class.java)
                         data .add (document.toObject(Wallet::class.java))!!
-                        Log.d("2acquiredWallet",data.toString())
                     }
 
                     Log.d("3data",data.toString())

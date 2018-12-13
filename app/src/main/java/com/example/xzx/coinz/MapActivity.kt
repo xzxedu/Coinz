@@ -141,8 +141,9 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                 collectCoins()
                 return super.onOptionsItemSelected(item)
             }
-            R.id.action_settings -> {
-                //TODO: intent startactivity to settings
+            R.id.bank -> {
+                var i = Intent(this,BankActivity::class.java)
+                startActivity(i)
                 return super.onOptionsItemSelected(item)
             }
             R.id.Wallet -> {

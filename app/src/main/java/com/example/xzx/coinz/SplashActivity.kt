@@ -20,8 +20,6 @@ class SplashActivity : AppCompatActivity() {
                     .build()
             firestore.setFirestoreSettings(settings)
 
-            Log.d("currentUser SPLASH",FirebaseAuth.getInstance().currentUser.toString() )
-
             if (FirebaseAuth.getInstance().currentUser == null)
                 startActivity<SignInActivity>()
             else

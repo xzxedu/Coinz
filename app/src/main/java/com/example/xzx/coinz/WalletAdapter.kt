@@ -85,6 +85,7 @@ class WalletAdapter(val context: Context,val DATA:ArrayList<Wallet>) :
                 mDialogView.dialogShareBtn.setOnClickListener{
                     mAlertDialog.dismiss()
                     val userID= mDialogView.dialogID.text.toString()
+                    var map:Map<String,Float>
                     // transfer the money to entered userID
                     firestoreInstance.collection("BANK Account")
                             .document(userID).get()
@@ -92,8 +93,12 @@ class WalletAdapter(val context: Context,val DATA:ArrayList<Wallet>) :
                                 if (task.isSuccessful) {
                                     val document = task.result
                                     if (document != null) {
-                                        var newGoldNum = document.data?.get("goldCoins").toString().toFloat().plus(equalGold)
-                                        var map = mapOf("goldCoins" to newGoldNum)
+                                        if (document.data != null){
+                                            var newGoldNum = document.data?.get("goldCoins").toString().toFloat().plus(equalGold)
+                                            map = mapOf("goldCoins" to newGoldNum)}
+                                        else
+                                            map = mapOf("goldCoins" to equalGold)
+
                                         firestoreInstance.collection("BANK Account").document(userID).update(map)
                                                 .addOnSuccessListener{
                                                     removeItem(currentPosition)

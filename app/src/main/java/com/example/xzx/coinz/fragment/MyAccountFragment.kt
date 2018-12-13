@@ -90,7 +90,6 @@ class MyAccountFragment : Fragment() {
     }
     override fun onStart() {
         super.onStart()
-        Log.d(tag,"print onstart")
         FirestoreUtil.getCurrentUser { user ->
             if (this@MyAccountFragment.isVisible) {
                 Log.d(tag,"print usernamesave"+user.name)

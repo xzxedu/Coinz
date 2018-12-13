@@ -6,13 +6,11 @@
         android:id="@+id/CollectButton"
         android:title="Collect Coins" />
     <item
-        android:id="@+id/action_settings"
-        android:title="Settings" />
-    <!--android:orderInCategory="100"-->
-    <!--app:showAsAction="withText|ifRoom"-->
-    <item
-        android:id="@+id/backgroundMode"
-        android:title="Background Mode" />
+        android:id="@+id/bank"
+        android:title="CENTER BANK" />
+    <!--<item-->
+        <!--android:id="@+id/backgroundMode"-->
+        <!--android:title="Background Mode" />-->
     <item
         android:id="@+id/Wallet"
         android:title="Wallet" />

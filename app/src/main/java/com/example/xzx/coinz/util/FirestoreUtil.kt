@@ -32,6 +32,9 @@ object FirestoreUtil {
                 currentUserDocRef.set(newUser).addOnSuccessListener {
                     onComplete()
                 }
+                // the first time register will acquire 100 GOLD coins
+                var goldCoins = mapOf("goldCoins" to 100)
+                firestoreInstance.collection("BANK Account").document(currentUserDocRef.id).update(goldCoins)
             }
             else
                 onComplete()

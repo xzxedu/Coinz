@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         navigation.setOnNavigationItemSelectedListener{
             when (it.itemId){
                 R.id.navigation_people -> {
-                    startActivity<Wallet2Activity>()
+                    startActivity<RankActivity>()
                     true
                 }
                 R.id.navigation_my_account -> {

@@ -73,13 +73,13 @@ class DownloadTask(val activity : Activity,val progressbar: ProgressBar,val text
     override fun onPreExecute() {
         progressbar.visibility = View.VISIBLE
         progressbar.progress = 0
-        textview.text = "downloading "
+        textview.text = "loading the map "
     }
 
     override fun onProgressUpdate(vararg values: Double?) {
-        val progress = (values[0]!! * 100).toInt()
+        val progress = (values[0]!!).toInt()
         progressbar.progress = progress
-        textview.text = "downloading: ${progress} "
+        textview.text = "loading the map: ${progress} "
     }
 
     override fun onPostExecute(result: String) {

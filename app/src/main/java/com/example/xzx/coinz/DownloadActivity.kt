@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.example.xzx.coinz.model.Wallet
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -40,6 +41,12 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
     private var textview: TextView?=null
     private var networkChangeReceiver:NetworkChangeReceiver?=null
 
+    private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+
+    private val currentUserDocRef: DocumentReference
+        get() = firestoreInstance.document("users/${FirebaseAuth.getInstance().currentUser?.uid
+                ?: throw NullPointerException("UID is null.")}")
+
     override fun downloadComplete(result: String) {
         geoJsonString = result
         val sharedPref = getSharedPreferences("Downloadmap",Context.MODE_PRIVATE)
@@ -51,7 +58,6 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
             commit() }
         //save today's currency in the shared Preference
         val geoJsonString: String = getIntent().getStringExtra("geoJsonString")
-        // upload rates to the firecloud
         var jsonObject = JSONTokener(geoJsonString).nextValue() as JSONObject
         val rates = jsonObject.getJSONObject("rates")
         with (sharedPref.edit()){
@@ -111,11 +117,21 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
                     finish()
                 }
                 else {
+                    // start a new activity as well as delete the old wallet data as the wallet can just keep on current day
+                    firestoreInstance.collection(currentUserDocRef.id).get()
+                            .addOnSuccessListener { documents ->
+                                for (document in documents){
+                                    firestoreInstance.collection(currentUserDocRef.id)
+                                            .document(document.id).delete()
+                                    Log.d("delteYesterday!!!",document.id.toString())
+                                }
+                            }
+                    //download today's new map
                     var DateUrl = "http://homepages.inf.ed.ac.uk/stg/coinz/" + currentDate + "/coinzmap.geojson"
-                    Log.i(tag, DateUrl)
                     DownloadTask(this, progressbar!!, textview!!,
                             this).execute(DateUrl)
                     }
+
             } catch (e: IOException) {
                 progressbar?.snackbar("download failed")
             }
