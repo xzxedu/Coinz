@@ -57,7 +57,6 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
             putString("geoJsonString",geoJsonString)
             commit() }
         //save today's currency in the shared Preference
-        val geoJsonString: String = getIntent().getStringExtra("geoJsonString")
         var jsonObject = JSONTokener(geoJsonString).nextValue() as JSONObject
         val rates = jsonObject.getJSONObject("rates")
         with (sharedPref.edit()){

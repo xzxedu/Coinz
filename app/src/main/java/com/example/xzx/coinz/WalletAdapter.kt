@@ -85,36 +85,11 @@ class WalletAdapter(val context: Context,val DATA:ArrayList<Wallet>) :
                 mDialogView.dialogShareBtn.setOnClickListener{
                     mAlertDialog.dismiss()
                     val userID= mDialogView.dialogID.text.toString()
-                    var map:Map<String,Float>
                     // transfer the money to entered userID
-                    firestoreInstance.collection("BANK Account")
-                            .document(userID).get()
-                            .addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
-                                if (task.isSuccessful) {
-                                    val document = task.result
-                                    if (document != null) {
-                                        if (document.data != null){
-                                            var newGoldNum = document.data?.get("goldCoins").toString().toFloat().plus(equalGold)
-                                            map = mapOf("goldCoins" to newGoldNum)}
-                                        else
-                                            map = mapOf("goldCoins" to equalGold)
-
-                                        firestoreInstance.collection("BANK Account").document(userID).update(map)
-                                                .addOnSuccessListener{
-                                                    removeItem(currentPosition)
-                                                    Toast.makeText(context, "Send successfully", Toast.LENGTH_LONG).show()}
-                                                .addOnFailureListener { Toast.makeText(context, "Sharing fails! Try again!", Toast.LENGTH_LONG).show()
-                                                }
-                                    }
-                                }
-                            })
-                    //delete shared coins information on the firestore
-                    firestoreInstance.collection(currentUserDocRef.id).document(currentWallet!!.id)
-                            .delete()
-                            .addOnSuccessListener { Toast.makeText(context, "Sharing successfully", Toast.LENGTH_LONG).show() }
-                            .addOnFailureListener { Toast.makeText(context, "Sharing fails! Try again!", Toast.LENGTH_LONG).show() }
+                    shareToOthers(userID,equalGold)
                 }
             }
+            // deposit coins to bank, maximum is 25
             itemView.imgSave.setOnClickListener{
                 val sharedPref = context.getSharedPreferences("Downloadmap",Context.MODE_PRIVATE)
                 var saveNum = sharedPref.getInt("SavedCoins",0)
@@ -124,23 +99,26 @@ class WalletAdapter(val context: Context,val DATA:ArrayList<Wallet>) :
                             .addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
                                 if (task.isSuccessful) {
                                     val document = task.result
-                                    if (document != null) {
-                                        var newGoldNum = document.data!!.get("goldCoins").toString().toFloat().plus(equalGold)
-                                        var map = mapOf("goldCoins" to newGoldNum)
-                                        firestoreInstance.collection("BANK Account").document(currentUserDocRef.id).update(map)
-                                                .addOnSuccessListener{
+                                    var map:Map<String,Float>
+                                    if (document!!.data != null){
+                                        var newGoldNum = document.data?.get("goldCoins").toString().toFloat().plus(equalGold)
+                                        map = mapOf("goldCoins" to newGoldNum)}
+                                    else
+                                        map = mapOf("goldCoins" to equalGold)
+                                    firestoreInstance.collection("BANK Account").document(currentUserDocRef.id).update(map)
+                                            .addOnSuccessListener{
                                                     removeItem(currentPosition)
-                                                    Toast.makeText(context, "Deposit successfully", Toast.LENGTH_LONG).show()}
-                                                .addOnFailureListener { Toast.makeText(context, "Try again!", Toast.LENGTH_LONG).show()
-                                                }
+                                                    Toast.makeText(context, "Deposit succesffully!", Toast.LENGTH_LONG).show()}
+                                            .addOnFailureListener { Toast.makeText(context, "Try again!", Toast.LENGTH_LONG).show()
+                                            }
+                                    Log.d("currentWalletId",currentWallet.id)
+                                    firestoreInstance.collection(currentUserDocRef.id).document(currentWallet!!.id)
+                                            .delete()
+                                            .addOnSuccessListener { Toast.makeText(context, "delete chosen item!", Toast.LENGTH_LONG).show() }
+                                            .addOnFailureListener { Toast.makeText(context, "Try again!", Toast.LENGTH_LONG).show() }
                                     }
-                                }
+
                             })
-                    Log.d("currentWalletId",currentWallet.id)
-                    firestoreInstance.collection(currentUserDocRef.id).document(currentWallet!!.id)
-                            .delete()
-                            .addOnSuccessListener { Toast.makeText(context, "Deposit successfully", Toast.LENGTH_LONG).show() }
-                            .addOnFailureListener { Toast.makeText(context, "Try again!", Toast.LENGTH_LONG).show() }
                     saveNum +=1
                     sharedPref.edit().putInt("SavedCoins",saveNum)
                     sharedPref.edit().commit()
@@ -148,8 +126,8 @@ class WalletAdapter(val context: Context,val DATA:ArrayList<Wallet>) :
                 else
                     Toast.makeText(context,"You have already saved 25 Coins today!",Toast.LENGTH_LONG).show()
             }
-            //TODO 让操作完 的item消失
         }
+
     fun setData(wallet: Wallet, pos: Int) {
         wallet?.let {
                 itemView.txvTitle.text = wallet.currency
@@ -158,8 +136,40 @@ class WalletAdapter(val context: Context,val DATA:ArrayList<Wallet>) :
             this.currentWallet = wallet
             this.currentPosition = pos
         }
+
+    fun shareToOthers(userID:String,equalGold:Float){
+        var map:Map<String,Float>
+        firestoreInstance.collection("BANK Account")
+                .document(userID).get()
+                .addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                    if (task.isSuccessful) {
+                        val document = task.result
+                        if (document != null) {
+                            if (document.data != null){
+                                var newGoldNum = document.data?.get("goldCoins").toString().toFloat().plus(equalGold)
+                                map = mapOf("goldCoins" to newGoldNum)}
+                            else
+                                map = mapOf("goldCoins" to equalGold)
+
+                            firestoreInstance.collection("BANK Account").document(userID).update(map)
+                                    .addOnSuccessListener{
+                                        removeItem(currentPosition)
+                                        Toast.makeText(context, "Sharing successfully", Toast.LENGTH_LONG).show()}
+                                    .addOnFailureListener { Toast.makeText(context, "Sharing fails! Try again!", Toast.LENGTH_LONG).show()
+                                    }
+                            //delete shared coins information on the firestore
+                            firestoreInstance.collection(currentUserDocRef.id).document(currentWallet!!.id)
+                                    .delete()
+                                    .addOnSuccessListener { Toast.makeText(context, "Coins deleted from your account", Toast.LENGTH_LONG).show() }
+                                    .addOnFailureListener { Toast.makeText(context, "Sharing fails! Try again!", Toast.LENGTH_LONG).show() }
+                        }
+                    }
+                })
+    }
     fun removeItem(position: Int){
-        DATA.removeAt(position)
+        Log.d("position!!!",position.toString())
+        Log.d("DATA!!!",DATA.toString())
+        DATA.removeAt((position-1))
     }
     }
 }

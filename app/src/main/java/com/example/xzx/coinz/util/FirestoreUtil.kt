@@ -34,7 +34,7 @@ object FirestoreUtil {
                 }
                 // the first time register will acquire 100 GOLD coins
                 var goldCoins = mapOf("goldCoins" to 100)
-                firestoreInstance.collection("BANK Account").document(currentUserDocRef.id).update(goldCoins)
+                firestoreInstance.collection("BANK Account").document(currentUserDocRef.id).set(goldCoins)
             }
             else
                 onComplete()
@@ -57,7 +57,6 @@ object FirestoreUtil {
         currentUserDocRef.get()
                 .addOnSuccessListener {
                     onComplete(it.toObject(User::class.java)!!)
-                    //it.exists()
                 }
 
     }

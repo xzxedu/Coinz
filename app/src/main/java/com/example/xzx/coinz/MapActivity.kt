@@ -87,10 +87,10 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
             for (f in it) {
                 val j = f.properties() as JsonObject
                 // undisplay the collected coins from firestore
-                firestore.collection(currentUserDocRef.id).document(j.get("id").toString()
-                        .replace('\"',' ').trim()).get()
+                var Docid =j.get("id").toString().replace('\"',' ').trim()
+                firestore.collection(currentUserDocRef.id).document(Docid).get()
                         .addOnCompleteListener {
-                            //if (it.result!!.exists() == false){
+                            if (it.result?.exists() == false){
                                 if (f.geometry() is Point) {
                                    p = f.geometry() as Point
                                    // Create an Icon object for the marker to use
@@ -106,9 +106,9 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                                           .snippet(j.get("marker-symbol").toString())
                                           .icon(icon)
                                           .position(LatLng(p!!.latitude(), p!!.longitude())))
-                                markerList .add(marker)
+                                markerList.add(marker)
                                 }
-                            //}
+                            }
                         }
             }
         }
@@ -153,10 +153,10 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                 return super.onOptionsItemSelected(item)
             }
 
-            R.id.backgroundMode -> {
-                //TODO: intent startactivity to backgroundMode
-                return super.onOptionsItemSelected(item)
-            }
+//            R.id.backgroundMode -> {
+//                //TODO: intent startactivity to backgroundMode
+//                return super.onOptionsItemSelected(item)
+//            }
             else -> return super.onOptionsItemSelected(item)
         }
     }
@@ -276,10 +276,12 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                                     val distance = currentlocation.distanceTo(temp)
                                     if (distance <= 25.00 ){
                                         ifCollect = true
-                                        updateCoinsFirestore(f,PointNum)
+                                        var mark = markerList.get(PointNum)
+                                        Log.d("marker!!!",mark.toString())
+                                        Log.d("markerList!!",markerList.toString())
+                                        mapboxMap!!.removeMarker(markerList.get(PointNum))
+                                        updateCoinsFirestore(f)
                                         // remove collected points Marker
-                                        this@MapActivity.mapboxMap!!.removeMarker(markerList.get(PointNum))
-                                        PointNum += 1
                                         break
                                     }
                                 }
@@ -292,25 +294,34 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                 }
             }
 
-            private fun updateCoinsFirestore(f: Feature, i:Int) {
+            private fun updateCoinsFirestore(f: Feature) {
                 val j = f.properties() as JsonObject
                 DOCUMENT_KEY = j.get("id").toString().replace('\"',' ').trim()
                 var documentKey = DOCUMENT_KEY!!
                 UserCollectedCoins = firestore?.collection(COLLECTION_KEY)?.document(documentKey)
-                // record their id
-                var PositionInf = mapOf(
-                        "id" to (j.get("id").toString()),
-                        "value" to (j.get("value").toString()),
-                        "currency" to (j.get("currency").toString())
-                )
-                // send the coins and listen for success or failure
-                if (PositionInf!=null){
-                    var toastString = "Collect Coins Successfully! Rest Coins:" + (50-i).toString()
-                    UserCollectedCoins!!.set(PositionInf)
-                            .addOnSuccessListener { Toast.makeText(this,
-                                    toastString,Toast.LENGTH_LONG).show()
-                            } // anko
-                            .addOnFailureListener { e -> Log.e("collectCoinsErro!", e.message) }
+                firestore?.collection(COLLECTION_KEY)?.document(documentKey).
+                        get().addOnCompleteListener{task ->
+                          if(task.isSuccessful){
+                              var documentsnapshot = task.result
+                              if (documentsnapshot!!.exists() == false)
+                              {
+                                  PointNum +=1
+                                  // record their id
+                                  var PositionInf = mapOf(
+                                          "id" to (j.get("id").toString()),
+                                          "value" to (j.get("value").toString()),
+                                          "currency" to (j.get("currency").toString()))
+                                  if (PositionInf!=null){
+                                      var toastString = "Collect Coins Successfully! Rest Coins:" + (50-PointNum).toString()
+                                      UserCollectedCoins!!.set(PositionInf)
+                                              .addOnSuccessListener { Toast.makeText(this,
+                                                      toastString,Toast.LENGTH_LONG).show()
+                                              } // anko
+                                              .addOnFailureListener { e -> Log.e("collectCoinsError!", e.message) }
+                                  }
+                              }
+                              else Toast.makeText(this,"already collected!",Toast.LENGTH_LONG).show()
+                          }
                 }
             }
         }

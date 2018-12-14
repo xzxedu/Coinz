@@ -51,7 +51,7 @@ class WalletActivity : AppCompatActivity() {
                         data .add (document.toObject(Wallet::class.java))!!
                     }
 
-                    Log.d("3data",data.toString())
+                    Log.d("WalletActivity","data"+data.toString())
                     val adapter= WalletAdapter(this,data)
                     recyclerView?.adapter = adapter
                 }
