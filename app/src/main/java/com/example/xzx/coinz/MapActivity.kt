@@ -110,25 +110,6 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                                 markerList.add(marker)
                                 }
                             }
-                            else {
-                                p = f.geometry() as Point
-                                // Create an Icon object for the marker to use
-                                color = j.get("marker-color").toString().replace('\"',' ').trim()
-                                when (color){
-                                    "#ff0000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.drawable.mapbox_marker_icon_default)
-                                    "#008000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_green)
-                                    "#0000ff" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
-                                    "#ffdf00" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)
-                                }
-                                var marker = mapboxMap!!.addMarker(MarkerOptions()
-                                        .title(j.get("currency").toString())
-                                        .snippet(j.get("marker-symbol").toString())
-                                        .icon(icon)
-                                        .position(LatLng(p!!.latitude(), p!!.longitude())))
-                                markerList.add(marker)
-                            }
-
-
                         }
 
             }
