@@ -42,22 +42,22 @@ class RankActivity : AppCompatActivity() {
                     }
         }
         // sort up each user's GOLD coins
-        var ranklist = RankList.sortedWith(compareBy({it.goldCoins}))
+        var ranklist = RankList.sortedWith(compareByDescending({it.goldCoins}))
         Log.d("ranklist!!",ranklist.toString())
-        for (i in -1..-3) {
+        for (i in 0..3) {
             when (i){
-                -1 -> {
+                0 -> {
                     var firstid = findViewById<TextView>(R.id.firstid)
                     firstid.setText(ranklist[i].id)
                     Log.d("ranlist11",ranklist[i].id)
                     var firstCoins = findViewById<TextView>(R.id.firstCoins)
                     firstCoins.setText(ranklist[i].goldCoins.toString())}
-                -2 -> {
+                1 -> {
                     var secondid = findViewById<TextView>(R.id.secondid)
                     secondid.setText(ranklist[i].id)
                     var secondCoins = findViewById<TextView>(R.id.secondcoins)
                     secondCoins.setText(ranklist[i].goldCoins.toString())}
-                -3 -> {
+                2 -> {
                     var thirdid = findViewById<TextView>(R.id.thirdid)
                     thirdid.setText(ranklist[i].id)
                     var thirdCoins = findViewById<TextView>(R.id.thirdcoins)
