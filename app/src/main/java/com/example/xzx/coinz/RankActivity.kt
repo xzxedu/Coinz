@@ -27,9 +27,15 @@ class RankActivity : AppCompatActivity() {
         var RankList = arrayListOf<bankAccount>()
         firestore.collection("BANK Account").get()
                 .addOnSuccessListener { documents ->
+                    var userCoin: bankAccount
                     for (document in documents){
                         if (document.exists()){
-                        var userCoin = bankAccount(document.id,document.data.get("goldCoins").toString().toFloat())
+                            if (document.data.get("goldCoins") == null){
+                                userCoin = bankAccount(document.id,0f)
+                            }
+                        else {
+                                userCoin = bankAccount(document.id,document.data.get("goldCoins").toString().toFloat())
+                            }
                         RankList.add (userCoin)
                         Log.d("RANK list",RankList.toString())}
                         else RankList.add(bankAccount("start your first game",0f))

@@ -65,6 +65,7 @@ class DownloadActivity : AppCompatActivity(),DownloadCompleteListener {
                putFloat("QUID",rates.get("QUID").toString().toFloat())
                putFloat("PENY" , rates.get("PENY").toString().toFloat())
                putInt("SavedCoins",0)
+               putInt("PointNum",0)
             commit()
         }
         //Log.i(tag,geoJsonString)

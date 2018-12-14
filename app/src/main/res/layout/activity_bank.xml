@@ -30,46 +30,50 @@
 
     <TextView
         android:id="@+id/DOLR_Rate"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="264dp"
-        android:layout_marginTop="152dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="156dp"
+        android:text="dolr rate"
         android:textColor="@android:color/black"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/PENY_Rate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="264dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="28dp"
+        android:text="peny rate"
         android:textColor="@android:color/black"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/DOLR_Rate" />
 
     <TextView
         android:id="@+id/QUID_Rate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="264dp"
+        android:layout_marginStart="100dp"
         android:layout_marginTop="32dp"
+        android:text="quid rate"
         android:textColor="@android:color/black"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/PENY_Rate" />
 
     <TextView
         android:id="@+id/SHIL_Rate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="264dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="36dp"
+        android:text="shil rate"
         android:textColor="@android:color/black"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/QUID_Rate" />
 
     <TextView

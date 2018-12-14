@@ -73,6 +73,7 @@ class WalletAdapter(val context: Context,val DATA:ArrayList<Wallet>) :
                 "SHIL" -> equalGold = currentWallet!!.value.toFloat() * shil
                 "QUID" -> equalGold = currentWallet!!.value.toFloat() * quid
             }
+            //rememever!! when click on the icon, just click once not double click!!
             itemView.imgShare.setOnClickListener {
                 //Inflate the dialog with custom view
                 val mDialogView = LayoutInflater.from(context).inflate(R.layout.share_dialog,null)
@@ -101,7 +102,9 @@ class WalletAdapter(val context: Context,val DATA:ArrayList<Wallet>) :
                                     val document = task.result
                                     var map:Map<String,Float>
                                     if (document!!.data != null){
+                                        Log.d("WalletAdapter","newGoldNum"+equalGold.toString())
                                         var newGoldNum = document.data?.get("goldCoins").toString().toFloat().plus(equalGold)
+                                        Log.d("WalletAdapter","newGoldNum"+newGoldNum.toString())
                                         map = mapOf("goldCoins" to newGoldNum)}
                                     else
                                         map = mapOf("goldCoins" to equalGold)
@@ -168,8 +171,8 @@ class WalletAdapter(val context: Context,val DATA:ArrayList<Wallet>) :
     }
     fun removeItem(position: Int){
         Log.d("position!!!",position.toString())
-        Log.d("DATA!!!",DATA.toString())
-        DATA.removeAt((position-1))
+        Log.d("DATA!!!",data.toString())
+        data.removeAt((position-1))
     }
     }
 }

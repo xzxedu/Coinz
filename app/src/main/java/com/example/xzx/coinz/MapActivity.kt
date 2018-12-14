@@ -1,6 +1,7 @@
 package com.example.xzx.coinz
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -43,6 +44,7 @@ import com.mapbox.geojson.Feature
 import com.mapbox.mapboxsdk.annotations.Icon
 import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.Marker
+import org.jetbrains.anko.commit
 import org.jetbrains.anko.startActivityForResult
 import java.util.ArrayList
 
@@ -67,7 +69,6 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                 ?: throw NullPointerException("UID is null.")}")
     private val COLLECTION_KEY=currentUserDocRef.id
     private var DOCUMENT_KEY:String ?= null
-    private var PointNum = 0
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -109,7 +110,27 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                                 markerList.add(marker)
                                 }
                             }
+                            else {
+                                p = f.geometry() as Point
+                                // Create an Icon object for the marker to use
+                                color = j.get("marker-color").toString().replace('\"',' ').trim()
+                                when (color){
+                                    "#ff0000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.drawable.mapbox_marker_icon_default)
+                                    "#008000" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_green)
+                                    "#0000ff" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_blue)
+                                    "#ffdf00" -> icon = IconFactory.getInstance(this@MapActivity).fromResource(R.mipmap.marker_icon_yellow)
+                                }
+                                var marker = mapboxMap!!.addMarker(MarkerOptions()
+                                        .title(j.get("currency").toString())
+                                        .snippet(j.get("marker-symbol").toString())
+                                        .icon(icon)
+                                        .position(LatLng(p!!.latitude(), p!!.longitude())))
+                                markerList.add(marker)
+                            }
+
+
                         }
+
             }
         }
     }
@@ -262,6 +283,7 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                 task.addOnSuccessListener { currentlocation: Location? ->
                     // Got last known location. In some rare situations this can be null.
                     if (currentlocation != null) {
+                        var i=0
                         var ifCollect: Boolean = false
                         val fc = geoJsonString.let { FeatureCollection.fromJson(it) }
                         val features = fc!!.features()
@@ -276,10 +298,11 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                                     val distance = currentlocation.distanceTo(temp)
                                     if (distance <= 25.00 ){
                                         ifCollect = true
-                                        var mark = markerList.get(PointNum)
+                                        var mark = markerList.get(i)
                                         Log.d("marker!!!",mark.toString())
                                         Log.d("markerList!!",markerList.toString())
-                                        mapboxMap!!.removeMarker(markerList.get(PointNum))
+                                        mapboxMap!!.removeMarker(markerList.get(i))
+                                        i += 1
                                         updateCoinsFirestore(f)
                                         // remove collected points Marker
                                         break
@@ -295,6 +318,8 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
             }
 
             private fun updateCoinsFirestore(f: Feature) {
+                var sharedPref = getSharedPreferences("Downloadmap",Context.MODE_PRIVATE)
+                var PointNum = sharedPref.getInt("PointNum",0)
                 val j = f.properties() as JsonObject
                 DOCUMENT_KEY = j.get("id").toString().replace('\"',' ').trim()
                 var documentKey = DOCUMENT_KEY!!
@@ -306,6 +331,8 @@ class MapActivity() : AppCompatActivity(), OnMapReadyCallback, PermissionsListen
                               if (documentsnapshot!!.exists() == false)
                               {
                                   PointNum +=1
+                                  sharedPref.edit().putInt("PointNum",PointNum)
+                                  sharedPref.edit().commit()
                                   // record their id
                                   var PositionInf = mapOf(
                                           "id" to (j.get("id").toString()),
